@@ -32,9 +32,9 @@ def get_root_dir():
     """W.I.P Functie om de dirname van de main file te krijgen"""
     return os.path.dirname(os.path.abspath(__file__))
 
-def Diffrential(function, variables):
+def Error_Function(function, variables):
     """
-    Functie die van elke wiskundige functie de totale diffrentiaal bepaald.
+    Functie die van elke wiskundige functie de onauwkeurigheid bepaald.
     Door elke variable appart te diffrentieren
     
     input:
@@ -43,7 +43,7 @@ def Diffrential(function, variables):
         variables (list): een list met daarin de sympy variable waar voor moet worden gedifferentieerd
 
     return:
-        de totale diffrentiaal van de gegeven functie in de vorm van een sympy vergelijking
+        de onauwkeurigheids vergelijking voor een functie in de vorm van een sympy vergelijking
 
     """
     # Defineer de totale diffrentiaal
@@ -51,6 +51,6 @@ def Diffrential(function, variables):
 
     # Loop door elke variable en bepaal de diffrentiaal voor 1 variable
     for variable in variables:
-        total_diffrential += sy.Abs(sy.diff(function, variable)) * sy.Symbol(f"\Delta {variable}")
+        total_diffrential += sy.Abs(sy.diff(function, variable))**2 * sy.Abs(sy.Symbol(f"\Delta {variable}"))**2
 
-    return total_diffrential
+    return sy.sqrt(total_diffrential)
