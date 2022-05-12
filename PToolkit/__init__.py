@@ -1,1 +1,1 @@
-from .PToolkit import AxisFormatter, Error_Function
+from .PToolkit import AxisFormatter, Error_function

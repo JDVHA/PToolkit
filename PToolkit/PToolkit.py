@@ -32,10 +32,10 @@ def get_root_dir():
     """W.I.P Functie om de dirname van de main file te krijgen"""
     return os.path.dirname(os.path.abspath(__file__))
 
-def Error_Function(function, variables):
+def Error_function(function, variables):
     """
     Functie die van elke wiskundige functie de onauwkeurigheid bepaald.
-    Door elke variable appart te diffrentieren
+    Door elke variable appart te diffrentieren.
     
     input:
         function (sympy.core.add.Add): een sympy vergelijking waar de totale diffrentiaal van 
