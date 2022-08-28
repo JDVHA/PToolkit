@@ -123,7 +123,7 @@ plt.show()
 
 The Result of the code above:
 
-[image]: Figures/Figure1.png
+[image]: _Figures/Figure1.png
 ![image] 
 
 # Example 2
@@ -173,3 +173,7 @@ PToolkit has three main goals:
 4. Custom colour map
 5. Custom dataframe (pandas) to latex converter
 
+# Install
+```
+pip install PToolkit
+```
