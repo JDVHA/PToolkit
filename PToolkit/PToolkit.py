@@ -1,3 +1,4 @@
+from ast import Raise
 import os
 import matplotlib.ticker as mticker
 import sympy as sy
@@ -7,136 +8,334 @@ from locale import setlocale, LC_NUMERIC
 import numpy as np
 
 
-class AxisFormatter(mticker.Formatter):
+class DecimalAxisFormatter(mticker.Formatter):
     """
-    Formatter class om de punten op de assen te vervangen
-    door comma's op basis van de hoeveelheid decimaal
+    Decimal axis formatter used to format the ticks on the x, y, z axis of a matplotlib plot.
     """
-    def __init__(self, decimaal):
-        """Initilaze formatter class"""
+    def __init__(self, decimaal, separator, imaginary=False):
+        """Initialization of the formatter class"""
         self.decimaal = decimaal
+        self.imaginary = imaginary
+        self.separator = "{" + separator + "}"
 
 
     def __call__(self, x, pos=None):
         """
-        Methode om de punten om de assen te vervangen met comma's
+        Methode used to replace the seperator in a given tick
 
         input:
-            x (float): een getal waarvan de punt naar comma moet worden verandert
-            pos: matplotlib variable
+            x (float): a number that needs to have it seperator changed to the desired seperator
         
         return:
-            een getal waarvan de punt is veranvangen door een comma
+            a number with the desired seperator
 
         """
+
+        # Define a string to perform operations on and round to the desired decimal place
         s = str(round(x, self.decimaal))
-        return f"${s.replace('.', '{,}')}$"
+
+        # Replace the current seperator with the desired seperator
+        tick = f"${s.replace('.', self.separator)}$"
+
+        # Check if the axis is imaginary
+        if self.imaginary:
+            tick += "i"
+
+        # Return tick
+        return tick
+
+class SignificantFigureAxisFormatter(mticker.Formatter):
+    """
+    Significant figure axis formatter used to format the ticks on the x, y, z axis of a matplotlib plot.
+    """
+    def __init__(self, significant_digit, separator, imaginary=False):
+        """Initialization of the formatter class"""
+        self.significant_digit = significant_digit
+        self.imaginary = imaginary
+        self.separator = "{" + separator + "}"
 
 
-def get_root_dir():
-    """W.I.P Functie om de dirname van de main file te krijgen"""
-    return os.path.dirname(os.path.abspath(__file__))
+    def __call__(self, x, pos=None):
+        """
+        Methode used to replace the seperator in a given tick
+
+        input:
+            x (float): a number that needs to have it seperator changed to the desired seperator
+        
+        return:
+            a number with the desired seperator
+
+        """
+
+        # Define a string to perform operations on and round to the desired significant figure digit
+        s = str(Round_sigfig(x, self.significant_digit))
+
+        # Replace the current seperator with the desired seperator
+        tick = f"${s.replace('.', self.separator)}$"
+
+        # Check if the axis is imaginary
+        if self.imaginary:
+            tick += "i"
+
+        # Return tick
+        return tick
+
+
 
 def Error_function(function, variables):
     """
-    Functie die van elke wiskundige functie de onauwkeurigheid bepaald.
-    Door elke variable appart te diffrentieren.
+    Function to determine the error of a function based on the errors of the
+    variables of set function.
     
     input:
-        function (sympy.core.add.Add): een sympy vergelijking waar de totale diffrentiaal van 
-        moet woden bepaald.
-        variables (list): een list met daarin de sympy variable waar voor moet worden gedifferentieerd
+        function (sympy.core.add.Add): a sympy expression of which the error function should be determined
+        variables (list): a list of all the variables used in the expression
 
     return:
-        de onauwkeurigheids vergelijking voor een functie in de vorm van een sympy vergelijking
+        a error function of the given input function
 
     """
-    # Defineer de totale diffrentiaal
+    # Define the total diffrential variable
     total_diffrential = 0
 
-    # Loop door elke variable en bepaal de diffrentiaal voor 1 variable
+    # Loop through every variable and determine its partial derivative and sum it to the total diffrential variabl
     for variable in variables:
         total_diffrential += sy.Abs(sy.diff(function, variable))**2 * sy.Abs(sy.Symbol(f"\Delta {variable}"))**2
 
+    # Return the error function
     return sy.sqrt(total_diffrential)
 
 
-
-
-def Config_plot_style(local=False):
-    # Zet de grid aan
-    mpl.rcParams["axes.grid"] = True
-
-    # Zet de standaard kleur en set de cyler voor de linestyles
-    mpl.rc('axes',
-        prop_cycle=(
-            mpl.cycler(color=['k', 'k', 'k', 'k']) +
-            mpl.cycler(linestyle=['--', ':', '-.', '-'])
-        )
-        )
-
-    # Check voor locale en verander naar comma WERKT NIET
-    if local:
-        setlocale(LC_NUMERIC)
-        mpl.rcParams['axes.formatter.use_locale'] = True
-
 def Find_nearest(array, value):
     """
-    Vind de waarde die het digst bij value zit in de array
+    Find the nearest variable in a list based on a input value
     """
+    # Determine the nearest index based on the smallest distance between the array value and
+    # the input value 
     idx = (np.abs(array - value)).argmin()
+
+    # Return the nearest value
     return array[idx]
 
 
 
-# W.I.P
-def Round_sigfig(x, fig, type="Normal"):
+def Round_sigfig(x, fig, type_rounding="Normal", format="numerical"):
     """
+    Function to round a number (or array) to n significant digits
+
+
     Input:
-        x: het getal wat moet worden afgerond op een significat cijfer. 
-        fig: het aantal significante cijfers
-        type: soort van afronding
-            "Normal": gebruikt round om af te ronden
-            "Up": Rond af naar boven
-            "Down": Rond af naar beneden
+        x (float): a number that needs to be rounded 
+        fig (int): the number of significant digits
+        type (str): the type of rounding
+            "Normal": rounds to the closest number
+            "Up": rounds up
+            "Down": rounds down
+        format (str): the data type it should return
 
     Output:
-        (float/int) een op een x aantal significat cijfer afrond cijfer.
+        (float/int) a number rounded based on the amount of significant digits
 
-    Werking: 
-    
-    De shifter bepaald met welke factor 10 x moet worden verschoven om een getal voor de comma te krijgen.
-    Door x te delen door de shifter komt de waarde van x in de vorm staan van: 4.7584 vervolgens kan er geround worden
-    op het aantal signifacte cijfers min 1 omdat het cijfer voor wel een significat fig is maar geen decimaal. Vervolgens
-    wordt de waarde terug geschoven met behulp van shifter.
     """
-
-    # Bepaal hoevaak een int van 10 in x past
-    int_aantal_10 = np.floor(np.log10(np.abs(x)))
-
-    # Gebruik normale afronding
-    if type == "Normal":
-        
-        # Bepaal shifting factor
-        shifter = 10**int_aantal_10
-
-        # Rond af en return
-        return np.round(x / shifter, fig-1)*shifter
     
-    # Rond af naar boven
-    elif type == "Up":
+    # Define a result variable
+    result = None
 
-        # Bepaal shifting factor
-        shifter = 10**(fig - int_aantal_10 - 1)
+    # Determine the highest power of 10 that can fit in x
+    int_count_10 = np.floor(np.log10(np.abs(x)))
 
-        # Rond af en return
-        return np.ceil(x * shifter)/shifter
+    # Use normal rounding
+    if type_rounding == "Normal":
+        
+        # Determine the shifting factor
+        shifter = 10**int_count_10
 
-    # Rond af naar beneden
-    elif type == "Down":
+        # Shift x by shifter round n digits and shift x back by shifter
+        result = np.round(x / shifter, fig-1)*shifter
+    
+    # Use ceil to round
+    elif type_rounding == "Up":
 
-        # Bepaal shifting factor en return
-        shifter = 10**(fig - int_aantal_10 - 1)
+        # Determine the shifting factor
+        shifter = 10**(fig - int_count_10 - 1)
 
-        # Rond af en return
-        return np.floor(x * shifter)/shifter
+        # Shift x by shifter round n digits up and shift x back by shifter
+        result = np.ceil(x * shifter)/shifter
+
+    # Use floor to round
+    elif type_rounding == "Down":
+
+        # Determine the shifting factor
+        shifter = 10**(fig - int_count_10 - 1)
+
+        # Shift x by shifter round n digits down and shift x back by shifter
+        result = np.floor(x * shifter)/shifter
+
+    else:
+        raise ValueError("Unkown type of rounding only Normal, Up and Down are available")
+
+class Plotter():
+    """
+    Plotting class containing functions and settings to format a scientific looking plot.
+    """
+    def __init__(self, seperator=","):
+        """
+        Initialization of the plotter class
+        and loading of basic settings
+        """
+        self.separator = seperator
+        self.Config_plot_style()
+
+    def Config_plot_style(self):
+        """
+        Function to set the basic settings of the plot using
+        rcParams 
+
+        note:
+            all parameters can be overwriten using basic mpl
+        """
+        # Turning on the grid
+        mpl.rcParams["axes.grid"] = True
+
+        # Setting standard line style and color
+        mpl.rc("axes",
+            prop_cycle=(
+                mpl.cycler(color=["k", "k", "k", "k"]) +
+                mpl.cycler(linestyle=["--", ":", "-.", "-"])
+            )
+            )
+
+        # Setting linewidth for errorbars and plot
+        mpl.rcParams["lines.linewidth"] = 1
+
+        # Setting capsize for errorbars
+        mpl.rcParams["errorbar.capsize"] = 2
+
+        # Locing the legend to upper right
+        mpl.rcParams["legend.loc"] = "upper right"
+
+    def Decimal_format_axis(self, ax, decimalx=1, decimaly=1, decimalz=None, imaginary_axis=""):
+        """
+        Function to format the axis of the plot using a decimal formatter
+
+        input:
+            ax: mpl axis object
+            decimalx (int): n digits to round to for the x axis
+            decimaly (int): n digits to round to for the y axis
+            decimalz (int): n digits to round to for the z axis
+            imaginary_axis (str): adds i to the end of every number 
+        """
+        
+        # Check for imaginary x axis and apply the formatter
+        if "x" in imaginary_axis:
+            ax.xaxis.set_major_formatter(DecimalAxisFormatter(decimalx, self.separator, True))
+        else:
+            ax.xaxis.set_major_formatter(DecimalAxisFormatter(decimalx, self.separator))
+        
+        # Check for imaginary y axis and apply the formatter
+        if "y" in imaginary_axis:
+            ax.yaxis.set_major_formatter(DecimalAxisFormatter(decimaly, self.separator, True))
+        else:
+            ax.yaxis.set_major_formatter(DecimalAxisFormatter(decimaly, self.separator))
+            
+        # Check if the z axis is used 
+        if decimalz != None:
+            # Check for imaginary z axis and apply the formatter
+            if "z" in imaginary_axis:
+                ax.zaxis.set_major_formatter(DecimalAxisFormatter(decimalz, self.separator, True))
+            else:
+                ax.zaxis.set_major_formatter(DecimalAxisFormatter(decimalz, self.separator))
+
+    def Significant_figure_format_axis(self, ax, sigfigx=1, sigfigy=1, sigfigz=None, imaginary_axis=""):
+        """
+        Function to format the axis of the plot using a  Significant figure formatter
+
+        input:
+            ax: mpl axis object
+            sigfigx (int): n significant digits to round to for the x axis
+            sigfigy (int): n significant digits to round to for the y axis
+            sigfigz (int): n significant digits to round to for the z axis
+            imaginary_axis (str): adds i to the end of every number 
+        """
+        
+        # Check for imaginary x axis and apply the formatter
+        if "x" in imaginary_axis:
+            ax.xaxis.set_major_formatter(SignificantFigureAxisFormatter(sigfigx, self.separator, True))
+        else:
+            ax.xaxis.set_major_formatter(SignificantFigureAxisFormatter(sigfigx, self.separator))
+        
+        # Check for imaginary y axis and apply the formatter
+        if "y" in imaginary_axis:
+            ax.yaxis.set_major_formatter(SignificantFigureAxisFormatter(sigfigy, self.separator, True))
+        else:
+            ax.yaxis.set_major_formatter(SignificantFigureAxisFormatter(sigfigy, self.separator))
+            
+        # Check if the z axis is used 
+        if sigfigz != None:
+            # Check for imaginary z axis and apply the formatter
+            if "z" in imaginary_axis:
+                ax.zaxis.set_major_formatter(SignificantFigureAxisFormatter(sigfigz, self.separator, True))
+            else:
+                ax.zaxis.set_major_formatter(SignificantFigureAxisFormatter(sigfigz, self.separator))
+
+    def Set_xlabel(self, ax, physical_quantity, unit, tenpower=0):
+        """
+        Function to create a label on the x axis
+
+        ax: mpl axis object
+        physical_quantity (str): the pysical quantity
+        unit (str): the unit of the pysical quantity
+        tenpower (int): the power for scientific notation
+        """
+
+        # Set label without scientific notation
+        if tenpower == 0:
+            ax.set_xlabel(f"${physical_quantity}$ [{unit}]", loc="center")
+
+
+        # Set label using scientific notation
+        elif tenpower != 0:
+            ax.set_xlabel(f"${physical_quantity}$" + "$\cdot 10^{" + str(tenpower) + "}$" +  f"[{unit}]", loc="center")
+
+
+    def Set_ylabel(self, ax, physical_quantity, unit, tenpower=0):
+        """
+        Function to create a label on the y axis
+
+        ax: mpl axis object
+        physical_quantity (str): the pysical quantity
+        unit (str): the unit of the pysical quantity
+        tenpower (int): the power for scientific notation
+        """
+
+        
+        # Set label without scientific notation
+        if tenpower == 0:
+            ax.set_ylabel(f"${physical_quantity}$ [{unit}]", loc="center")
+
+        # Set label using scientific notation
+        elif tenpower != 0:
+            ax.set_ylabel(f"${physical_quantity}$" + "$\cdot 10^{" + str(tenpower) + "}$" +  f"[{unit}]", loc="center")
+
+    def Set_zlabel(self, ax, physical_quantity, unit, tenpower=0):
+        """
+        Function to create a label on the z axis
+
+        ax: mpl axis object
+        physical_quantity (str): the pysical quantity
+        unit (str): the unit of the pysical quantity
+        tenpower (int): the power for scientific notation
+        """
+
+        # Some mpl 3D stuff
+        rot = 0
+        ax.zaxis.set_rotate_label(False)
+
+
+        # Set label without scientific notation
+        if tenpower == 0:
+            ax.set_zlabel(f"${physical_quantity}$ [{unit}]", rotation=rot)
+
+        # Set label using scientific notation
+        elif tenpower != 0:
+            ax.set_zlabel(f"${physical_quantity}$" + "$\cdot 10^{" + str(tenpower) + "}$" +  f"[{unit}]", rotation=rot)
