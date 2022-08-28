@@ -174,41 +174,6 @@ def Round_sigfig(x, fig, type_rounding="Normal", format="numerical"):
     else:
         raise ValueError("Unkown type of rounding only Normal, Up and Down are available")
 
-    if format == "numerical":
-        return result
-    
-    elif format == "text":
-        """W.I.P"""
-        if type(result).__module__ == "numpy":
-            str_result = result.astype("str")
-            str_result_return = []
-
-            print(str_result)
-            for r in str_result:
-                i = r.index(".")
-                n = len(r[i:])-1
-                diff = fig - (len(r)-1)
-                
-                
-                print(diff, len(r)-1, r, i, n)
-                
-                if diff < 0:
-                    str_result_return.append(r[:diff])
-                elif diff > 0:
-                    str_result_return.append(r + "0"*diff)
-                else:
-                    str_result_return.append(r)
-
-            return np.array(str_result_return)
-        else:
-            str_result = str(result)
-            if len(str_result)-1 > fig:
-                str_result = str_result[:-2]
-            return str_result
-
-    else:
-        raise ValueError("Unkown format only numerical and text are available")
-
 class Plotter():
     """
     Plotting class containing functions and settings to format a scientific looking plot.

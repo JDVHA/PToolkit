@@ -4,5 +4,3 @@ build/
 Ptoolkit.egg-info/
 PToolkit/Test.py
 PToolkit/__pycache__
-build.bat
-.pypirc
