@@ -174,6 +174,8 @@ def Round_sigfig(x, fig, type_rounding="Normal", format="numerical"):
     else:
         raise ValueError("Unkown type of rounding only Normal, Up and Down are available")
 
+    return result
+
 class Plotter():
     """
     Plotting class containing functions and settings to format a scientific looking plot.
