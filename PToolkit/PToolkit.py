@@ -1,10 +1,9 @@
-from ast import Raise
 import os
 import matplotlib.ticker as mticker
 import sympy as sy
 import matplotlib as mpl
 from math import floor, log10, ceil
-from locale import setlocale, LC_NUMERIC
+from scipy.integrate import quad
 import numpy as np
 
 
@@ -341,3 +340,96 @@ class Plotter():
         # Set label using scientific notation
         elif tenpower != 0:
             ax.set_zlabel(f"${physical_quantity}$" + "$\cdot 10^{" + str(tenpower) + "}$" +  f"[{unit}]", rotation=rot)
+
+
+
+def Fourier_series_cos_term(func, k, omega_0):
+    """
+    Decorator to convert any function to a intergrant for a fourier series (cos)
+
+    Input:
+        func (python function object): A function that needs te be converted
+        k (int): The index of the fourier sereies
+        omega_0 (float): The ground radial velocity
+
+    Output:
+        A function multiplied by the cosine term in a fourier series 
+    """
+
+    # Create a wrapper and take all arguments from the function
+    def wrapper(*args, **kwargs):
+        # Convert  the function by passing all arguments in to the function 
+        # Then multipli the function by cosine and give it as input the 
+        # The index multiplied by the ground radial velocity and t (args[0] must be the variable)
+        result = func(*args, **kwargs)*np.cos(k*omega_0*args[0])
+
+        # Return the result of the function
+        return result
+
+    # Return the wrapper as the new function
+    return wrapper
+
+
+def Fourier_series_sin_term(func, k, omega_0):
+    """
+    Decorator to convert any function to a intergrant for a fourier series (sin)
+
+    Input:
+        func (python function object): A function that needs te be converted
+        k (int): The index of the fourier sereies
+        omega_0 (float): The ground radial velocity
+
+    Output:
+        A function multiplied by the sine term in a fourier series 
+    """
+
+    # Create a wrapper and take all arguments from the function
+    def wrapper(*args, **kwargs):
+        # Convert  the function by passing all arguments in to the function 
+        # Then multipli the function by cosine and give it as input the 
+        # The index multiplied by the ground radial velocity and t (args[0] must be the variable)
+        result = func(*args, **kwargs)*np.sin(k*omega_0*args[0])
+
+        # Return the result of the function
+        return result
+
+    # Return the wrapper as the new function
+    return wrapper
+
+def Fourier_series(func, T, n):
+    """
+    A function to calculate the coefficients of the fourier series for any function numerically
+    Input:
+        func (python function object): The function of which the fourier series has te be
+            calculated
+        T (float): The period of the 
+        n (int): the amount of terms of the fourier series
+    """
+
+    # Calculate the ground radial velocity
+    omega_0 = 2*np.pi/T
+
+    # Create arrays for the coefficients of the fourier series
+    array_a_n = []
+    array_b_n = []
+
+    # Calculate a_0 of the fourier series
+    a_0 = 1/T*quad(func, 0, T)[0]
+
+    # Loop over the terms
+    for k in range(n):
+
+        # Convert the function given to the intergrand for the value k
+        func_cos = Fourier_series_cos_term(func, omega_0, k)
+        func_sin = Fourier_series_sin_term(func, omega_0, k)
+
+        # Calculate the intergral using scipy 
+        a_n = 2/T*quad(func_cos, 0, np.pi)[0]
+        b_n = 2/T*quad(func_sin, 0, np.pi)[0]
+
+        # Append the coefficients to there respected arrays
+        array_a_n.append(a_n)
+        array_b_n.append(b_n)
+
+    # Return a_0 and the coefficient arrays
+    return a_0, array_a_n, array_b_n

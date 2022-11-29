@@ -3,6 +3,9 @@ dist/
 build/
 Ptoolkit.egg-info/
 PToolkit/Test.py
+PToolkit/PToolkit_test.py
+PToolkit/Run_tests.bat
+Ptoolkit/Test data.csv
 PToolkit/__pycache__
 build.bat
 Upload.txt
