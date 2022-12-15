@@ -114,7 +114,7 @@ def Find_nearest(array, value):
     idx = (np.abs(array - value)).argmin()
 
     # Return the nearest value
-    return array[idx]
+    return array[idx], idx
 
 
 
@@ -433,3 +433,113 @@ def Fourier_series(func, T, n):
 
     # Return a_0 and the coefficient arrays
     return a_0, array_a_n, array_b_n
+
+def Standaard_error_per_index(*arrays):
+    """
+    A function to calculate the standaard error per index
+
+    Input (list or numpy array): Lists for wich the standaard error has 
+    to be calculeted per index.
+
+    Output (umpy array): A list of standaard errors per index
+    """
+
+    # Create a matrix with the given arrays
+    M = np.array([*arrays])
+
+    # Determine the shape of the matrix 
+    rows = M.shape[0]
+    columns = M.shape[1]
+    
+    # Create a array to store the std per column
+    E = np.array([])
+
+    # Loop over all the columns in the matrix
+    for i in range(columns):
+
+        # Calculate the std for all columns
+        s = np.std(M[:,i], ddof=1)
+
+        # Append the std to the array
+        E = np.append(E, s)
+
+    # Calculate the standaard error
+    return E/np.sqrt(rows)
+
+def Dataframe_to_latex(dataframe, sep=","):
+    """
+    Function to convert a pandas datafrrame in a latex table
+
+    Input:
+    dataframe (pandas dataframe): The dataframe thats needs to be converted
+    sep (string): The seperator sign
+
+    """
+
+    # Create a string to store the latex table
+    latex_string = "" 
+
+    # Get the headers from pandas dataframe
+    headers = dataframe.columns
+
+    # Get the column count of the pandas dataframe
+    column_count = len(dataframe.columns)
+
+    # Add the top side of the pandas dataframe
+    latex_string = "\\begin{table}[h]\n  \\centering\n   \\begin{tabular}" + "{" + "c"*column_count + "}" + "\n"
+    
+    # Create a header variable
+    header = "       "
+
+    # Loop through all headers and add the column name to the header variabla
+    for i, h in enumerate(headers):
+
+        # Add column name to the header
+        header += h
+
+        # Check if it is the last column
+        if i != len(headers)-1:
+
+            # If not the last add &
+            header += " & "  
+        else:
+            # If last then add \\ to the end
+            header += "\\\ \n"
+
+    # Add the header to the dataframe
+    latex_string += header
+
+    # Add the hline to the latex string
+    latex_string += "       \\hline \n"
+
+
+    # Loop over all rows in the dataframe
+    for row in dataframe.itertuples(index=False):
+
+        # Create row string variable
+        row_string= "       "
+        
+        # Loop over all elements in a row
+        for i, element in enumerate(row):
+
+
+            # Add element to the row string
+            row_string += str(element).replace(".", sep)
+
+            # Check if it is the last element
+            if i != len(row)-1:
+
+                # If it is not the last element add &
+                row_string += " & "  
+            else:
+                # If it is the last element add \\
+                row_string += "\\\ \n"
+
+        # Add the row string to the latex string
+        latex_string += row_string
+    
+    # Add to botem of the latex table to the string
+    latex_string += "   \\end{tabular}\n   \\caption{Caption}\n   \\label{tab:my_label}\n\\end{table}"
+
+    # Print the string so the user can copy it
+    print(latex_string)
