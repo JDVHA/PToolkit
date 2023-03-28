@@ -5,6 +5,7 @@ import matplotlib as mpl
 from math import floor, log10, ceil
 from scipy.integrate import quad
 import numpy as np
+from scipy.special import gamma
 
 
 class DecimalAxisFormatter(mticker.Formatter):
@@ -486,7 +487,7 @@ def Dataframe_to_latex(dataframe, sep=","):
     column_count = len(dataframe.columns)
 
     # Add the top side of the pandas dataframe
-    latex_string = "\\begin{table}[h]\n  \\centering\n   \\begin{tabular}" + "{" + "c"*column_count + "}" + "\n"
+    latex_string = "\\begin{table}[h]\n  \\centering\n  \\caption{Caption}\n   \\begin{tabular}" + "{" + "c"*column_count + "}" + "\n"
     
     # Create a header variable
     header = "       "
@@ -539,7 +540,65 @@ def Dataframe_to_latex(dataframe, sep=","):
         latex_string += row_string
     
     # Add to botem of the latex table to the string
-    latex_string += "   \\end{tabular}\n   \\caption{Caption}\n   \\label{tab:my_label}\n\\end{table}"
+    latex_string += "   \\end{tabular}\n   \\label{tab:my_label}\n\\end{table}"
 
     # Print the string so the user can copy it
     print(latex_string)
+
+def Chi_square_test(theorie, mean, error):
+    """
+    Function to perform a Chi^2 test
+
+
+    Input (must be a numpy array):
+        theorie (float): Theoretical value of a data point
+        mean (float): The mean of that data point
+        error (float): The error of that data point
+
+    Output:
+        The value of Chi^2 test
+    """
+    return np.sum(((theorie-mean)/error)**2)
+
+def Chi_square_dist(x, d):
+    """
+    Function to calculate the values on a Chi^2 dist
+
+    Input:
+        x (float): De Chi^2 value
+        d (int): Degrees of freedom
+
+    Output:
+        The value at a given point in the Chi^2 dist
+    """
+    return (x**(d/2-1)*np.exp(-x/2))/(2**(d/2)*gamma(d/2))
+
+
+def Calculate_degrees_of_freedom(n, v):
+    """
+    Function to calculte the number of degrees of freedom
+
+    Input:
+        n (int): Amount of independent data points
+        v (int): Amount of parameters
+
+    Output:
+        Amount of degrees of freedom
+    """
+    return n-v
+
+
+def Calculate_p_value(chi, d):
+    """
+    Function to calculte the p value based on a chi^2 dist
+
+    Input:
+        chi (float): The value found for chi^2
+        d (int): Degrees of freedom
+
+    Output (float):
+        The p value for a fiven chi^2
+    """
+    v = lambda x: (x**(d/2-1)*np.exp(-x/2))/(2**(d/2)*gamma(d/2))
+    p = quad(v, chi, np.Inf)[0]
+    return p

@@ -1,1 +1,1 @@
-from .PToolkit import Error_function, Find_nearest, Round_sigfig, Plotter, Standaard_error_per_index, Dataframe_to_latex
+from .PToolkit import Error_function, Find_nearest, Round_sigfig, Plotter, Standaard_error_per_index, Dataframe_to_latex, Chi_square_test, Chi_square_dist, Calculate_degrees_of_freedom, Calculate_p_value
