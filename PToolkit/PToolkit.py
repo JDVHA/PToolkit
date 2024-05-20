@@ -6,6 +6,25 @@ from math import floor, log10, ceil
 from scipy.integrate import quad
 import numpy as np
 from scipy.special import gamma
+import warnings
+import inspect
+
+
+def Deprecated(message="", type="removed"):
+    def wrapper(func):
+        if inspect.isclass(func):
+            fmt = "class"
+        
+        elif inspect.ismethod(func):
+            fmt = "method"
+
+        elif inspect.isfunction:
+            fmt = "function"
+        warnings.warn(f"The {fmt} {func.__name__} will be {type} in future versions of PToolkit please use a diffrent {fmt} or read the new documentation. {message}", DeprecationWarning)
+        return func
+    
+    return wrapper
+
 
 
 class DecimalAxisFormatter(mticker.Formatter):
@@ -280,6 +299,7 @@ class Plotter():
             else:
                 ax.zaxis.set_major_formatter(SignificantFigureAxisFormatter(sigfigz, self.separator))
 
+    @Deprecated()
     def Set_xlabel(self, ax, physical_quantity, unit, tenpower=0):
         """
         Function to create a label on the x axis
@@ -299,7 +319,7 @@ class Plotter():
         elif tenpower != 0:
             ax.set_xlabel(f"${physical_quantity}$" + "$\cdot 10^{" + str(tenpower) + "}$" +  f"[{unit}]", loc="center")
 
-
+    @Deprecated()
     def Set_ylabel(self, ax, physical_quantity, unit, tenpower=0):
         """
         Function to create a label on the y axis
@@ -319,6 +339,7 @@ class Plotter():
         elif tenpower != 0:
             ax.set_ylabel(f"${physical_quantity}$" + "$\cdot 10^{" + str(tenpower) + "}$" +  f"[{unit}]", loc="center")
 
+    @Deprecated()
     def Set_zlabel(self, ax, physical_quantity, unit, tenpower=0):
         """
         Function to create a label on the z axis
@@ -343,7 +364,7 @@ class Plotter():
             ax.set_zlabel(f"${physical_quantity}$" + "$\cdot 10^{" + str(tenpower) + "}$" +  f"[{unit}]", rotation=rot)
 
 
-
+@Deprecated()
 def Fourier_series_cos_term(func, k, omega_0):
     """
     Decorator to convert any function to a intergrant for a fourier series (cos)
@@ -370,7 +391,7 @@ def Fourier_series_cos_term(func, k, omega_0):
     # Return the wrapper as the new function
     return wrapper
 
-
+@Deprecated()
 def Fourier_series_sin_term(func, k, omega_0):
     """
     Decorator to convert any function to a intergrant for a fourier series (sin)
@@ -397,6 +418,8 @@ def Fourier_series_sin_term(func, k, omega_0):
     # Return the wrapper as the new function
     return wrapper
 
+
+@Deprecated()
 def Fourier_series(func, T, n):
     """
     A function to calculate the coefficients of the fourier series for any function numerically
@@ -435,6 +458,8 @@ def Fourier_series(func, T, n):
     # Return a_0 and the coefficient arrays
     return a_0, array_a_n, array_b_n
 
+
+@Deprecated("Nunpy it self can do this operation faster")
 def Standaard_error_per_index(*arrays):
     """
     A function to calculate the standaard error per index
