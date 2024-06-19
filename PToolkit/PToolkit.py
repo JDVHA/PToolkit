@@ -138,7 +138,7 @@ def Find_nearest(array, value):
 
 
 
-def Round_sigfig(x, fig, type_rounding="Normal", format="numerical"):
+def Round_sigfig(x, fig, type_rounding="Normal", format="str"):
     """
     Function to round a number (or array) to n significant digits
 
@@ -191,9 +191,17 @@ def Round_sigfig(x, fig, type_rounding="Normal", format="numerical"):
         result = np.floor(x * shifter)/shifter
 
     else:
-        raise ValueError("Unkown type of rounding only Normal, Up and Down are available")
+        raise ValueError("Unkown type of rounding only: Normal, Up and Down are available")
 
-    return result
+    if format == "numerical":
+        return result
+    elif format == "str":
+        try:
+            return str(result)[:fig]
+        except:
+            return str(result)
+    else:
+        raise ValueError("Unkown type of format only: numerical and str are available")
 
 class Plotter():
     """
