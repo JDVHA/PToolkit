@@ -80,6 +80,7 @@ class Interface:
         self.utilfuncs = ["RegisterCommand", "RegisterKey", "grid", "pack", "Post_init"]
         self.frame = tk.LabelFrame(master, text=text)
         PTOOLKITLOGGER.debug(f"Just created an instance of {self.classname}.")
+        master.AppendInterface(self)
 
     def Post_init(self):
 
@@ -129,7 +130,6 @@ class Interface:
         return _Appenddict
 
     def RegisterKey(self, keyname, function):
-        print(f"Registering key '{keyname}' in {self.classname}")
         PTOOLKITLOGGER.debug(f"Registered {keyname} as a key for interface {self.classname}")
         self.keys[keyname] = function
 
@@ -151,12 +151,13 @@ class Interface:
     def pack(self, *args, **kwargs):
         self.frame.pack(*args, **kwargs)
 
+
 class Parameter:
     def __init__(self, source):
         self.source = source
 
     def __Check__(self, otherparam):
-        val1 = self.source.get()
+        val1 = self.source()
         
         if issubclass(type(otherparam), Parameter):
             val2 = otherparam.get()
@@ -209,7 +210,7 @@ class Parameter:
         return val1 ** val2
     
     def __neg__(self):
-        val = self.source.get()
+        val = self.source()
         try:
             return -float(val)
         except:
@@ -240,35 +241,65 @@ class Parameter:
         return val1 > val2
     
     def __float__(self):
-        val = self.source.get()
+        val = self.source()
         
         try:
             return float(val)
         except:
             TypeError("Parameter is not numerical")
 
+    def __str__(self):
+        val = self.source()
+        return str(val)
+
+class Display(tk.Frame, Parameter):
+    def __init__(self, root, text="", unit="-", font=2):
+        tk.Frame.__init__(self, root)
+        self.unit = unit
+        self.text = text 
+
+        self.textvariable = tk.StringVar()
+
+        self.textlabel = tk.Label(self, text=self.text, font=font, anchor="w")
+        self.displaylabel = tk.Label(self, textvariable=self.textvariable, font=font)
+        self.unitlabel = tk.Label(self, text=self.unit, font=font)
+
+        self.textlabel.grid(row=0, column=0)
+        self.displaylabel.grid(row=0, column=1)
+        self.unitlabel.grid(row=0, column=2)
+
+        self.textvariable.set("0")
+        Parameter.__init__(self, self.get)
+
+    def get(self):
+        return self.textvariable.get()
+    
+    def set(self, value):
+        self.textvariable.set(value)
+        
 
 class ParameterField(tk.Frame, Parameter):
     def __init__(self, root, text="", unit="-", font=2):
         tk.Frame.__init__(self, root)
         
         self.unit = unit
-        self.text = text + f" [{unit}]"
+        self.text = text 
         
-        self.TextLabel = tk.Label(self, text=self.text, font=font, anchor="w")
+        self.textLabel = tk.Label(self, text=self.text, font=font, anchor="w")
+        self.spinBox = tk.Spinbox(self, font=font)
+        self.unitlabel = tk.Label(self, text=self.unit, font=font)
 
-        self.SpinBox = tk.Spinbox(self, font=font)
+        self.spinBox.insert(0, "0.0")
 
-        self.SpinBox.insert(0, "0.0")
+        Parameter.__init__(self, self.get)
 
-        Parameter.__init__(self, self.SpinBox)
-
-        self.TextLabel.grid(row=0, column=0, rowspan=2, sticky='nesw')
-        self.SpinBox.grid(row=0, column=1, rowspan=2, sticky='nesw')
+        self.textLabel.grid(row=0, column=0, sticky='nesw')
+        self.spinBox.grid(row=0, column=1, sticky='nesw')
+        self.unitlabel.grid(row=0, column=2, sticky='nesw')
     
 
     def get(self):
-        return self.SpinBox.get()
+        return self.spinBox.get()
     
 class SerialPortSelector(tk.Frame):
     
@@ -424,7 +455,7 @@ class TkTable(tk.LabelFrame):
         self.dataframe = dataframe
         self.columns = ["Index", *list(dataframe.columns)]
 
-        self.treeview  =ttk.Treeview(self, selectmode ='browse',columns=self.columns, show='headings')
+        self.treeview = ttk.Treeview(self, selectmode ='browse',columns=self.columns, show='headings')
         self.treeview.grid(row=0,column=0)
         
         self.horizontalscrollbar = tk.Scrollbar(self)

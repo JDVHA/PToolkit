@@ -1,0 +1,2 @@
+scripting support
+combobox and entry change support
