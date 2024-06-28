@@ -1,2 +1,3 @@
 scripting support
 combobox and entry change support
+mcom terminal support

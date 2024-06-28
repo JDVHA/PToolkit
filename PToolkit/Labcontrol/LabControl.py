@@ -1,5 +1,5 @@
 import tkinter as tk
-import logging, time
+import logging, time, os
 import threading
 from matplotlib.animation import FuncAnimation
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -25,89 +25,39 @@ INIT_FASE = True
 class MainPToolkitApp(tk.Tk):
     def __init__(self, *kwargs, **args):
         tk.Tk.__init__(self, *kwargs, **args)
-        self.interfaces = []
 
     def mainloop(self):
         self.StartApp()
         self.tk.mainloop()
     
     def StartApp(self):
-        
-        for interface in self.interfaces:
-            interface.Post_init()
-        
         global INIT_FASE
         if not INIT_FASE:
             raise SystemError("""INIT_FASE was false. Possible causes: INIT_FASE was changed in the program by the user. Or a second App was created, a maximum of 1 App may exist per program.""")
         INIT_FASE = False
         PTOOLKITLOGGER.info(f"Just started the main application.")
 
-    def AppendInterface(self, interface):
-        PTOOLKITLOGGER.debug(f"Just added an instance of {interface.__class__.__name__} to main.")
-        self.interfaces.append(interface)
-        
-class Command:
-    def __init__(self, profile, root):
-        self.name = profile["name"]
-        self.excutefunction = profile["command"]
-        self.GUI_element = profile["gui_element"]
-        self.GUI_link = profile["links"]
-        self.root = root
-        self.Pre_constructer()
-        
-
-    def Pre_constructer(self):
-        if self.GUI_element == None:
-            pass
-        elif self.GUI_element == tk.Button:
-            self.GUI_element = tk.Button(master=self.root, text=self.name, command=self.Excute_wrapper)
-
-    def Excute_wrapper(self):
-        results = [self.excutefunction()]
-        for i in range(len(results)):
-            try: 
-                self.GUI_link[i](results[i])
-            except Exception as ex:
-                PTOOLKITLOGGER.warning(f"There is no link")
-        return results
-
-
 class Interface:
-    def __init__(self, master, text=None):
+    def __init__(self, master, name):
         self.classname = self.__class__.__name__
+        self.name = name
         self.commands = {}
         self.keys = {}
         self.utilfuncs = ["RegisterCommand", "RegisterKey", "grid", "pack", "Post_init"]
-        self.frame = tk.LabelFrame(master, text=text)
+        self.frame = tk.LabelFrame(master, text=name)
         PTOOLKITLOGGER.debug(f"Just created an instance of {self.classname}.")
-        master.AppendInterface(self)
-
-    def Post_init(self):
-
         PTOOLKITLOGGER.debug(f"Starting post init of an {self.classname} instance.")
 
         for i in dir(self):
             if not (i.startswith("_") or i.endswith("_") or i in self.utilfuncs):
                 if callable(getattr(self, i)):
-                    profile = getattr(self, i)()
-                    profile["command"] = getattr(self, i)
-                    links = []
-                    
-                    for key in profile["links"]:
-                        try:
-                            links.append(self.keys[key])
-                        except KeyError as e:
-                            raise SystemError(f"The key: {key} is not registered.")
-                        
-                    profile["links"] = links
-                    self.commands[i] = Command(profile, self.frame)
+                    name = getattr(self, i)()
 
-        PTOOLKITLOGGER.debug(f"Finished post init of an {self.classname} instance.")
-        
-        self._Construct_GUI()
+                    self.commands[name] = getattr(self, i)
 
+        PTOOLKITLOGGER.debug(f"Finished post init of an {self.classname} instance.")        
 
-    def RegisterCommand(name, GUI_element=None, links=[]):
+    def RegisterCommand(name, links=[]):
         
         def _Appenddict(function):
             
@@ -116,14 +66,12 @@ class Interface:
                 
                 if INIT_FASE:
                     PTOOLKITLOGGER.debug(f"Registered {name} as a command for interface {self.classname}")
-                    return  {
-                    "name": name,
-                    "command": function,
-                    "gui_element": GUI_element,
-                    "links": links
-                    }
+                    return name
 
                 else:
+                    for key in links:
+                        f = self.keys[key]
+                        f(function(*args))
                     return function(*args)
             
             return wrapper
@@ -132,18 +80,6 @@ class Interface:
     def RegisterKey(self, keyname, function):
         PTOOLKITLOGGER.debug(f"Registered {keyname} as a key for interface {self.classname}")
         self.keys[keyname] = function
-
-
-    def _Construct_GUI(self):
-        PTOOLKITLOGGER.debug(f"Starting automatic GUI constructer for an instance of {self.classname}")
-        
-        for _, command in self.commands.items():
-            if command.GUI_element == None:
-                pass
-            else:
-                command.GUI_element.pack()
-
-        PTOOLKITLOGGER.debug(f"Finished automatic GUI constructer for an instance of {self.classname}")
 
     def grid(self, *args, **kwargs):
         self.frame.grid(*args, **kwargs)
@@ -254,7 +190,7 @@ class Parameter:
 
 class Display(tk.Frame, Parameter):
     def __init__(self, root, text="", unit="-", font=2):
-        tk.Frame.__init__(self, root)
+        tk.Frame.__init__(self, root.frame)
         self.unit = unit
         self.text = text 
 
@@ -275,12 +211,14 @@ class Display(tk.Frame, Parameter):
         return self.textvariable.get()
     
     def set(self, value):
+        if isinstance(value, ParameterField):
+            value = value.get()
         self.textvariable.set(value)
         
 
 class ParameterField(tk.Frame, Parameter):
-    def __init__(self, root, text="", unit="-", font=2):
-        tk.Frame.__init__(self, root)
+    def __init__(self, root, text="", unit="-", font=2, save=True):
+        tk.Frame.__init__(self, root.frame)
         
         self.unit = unit
         self.text = text 
@@ -304,7 +242,7 @@ class ParameterField(tk.Frame, Parameter):
 class SerialPortSelector(tk.Frame):
     
     def __init__(self, root, serial, text="Serial devices: ", terminal=None):
-        tk.Frame.__init__(self, root)
+        tk.Frame.__init__(self, root.frame)
         
         self.serial = serial
         self.terminal = terminal
@@ -319,7 +257,8 @@ class SerialPortSelector(tk.Frame):
         self.Label.grid(row=0, column=0)
         self.ComboBox.grid(row=0, column=1)
         self.Button.grid(row=0, column=2)
-        
+        if self.terminal != None:
+            self.terminal.Add_Commands({"reloadserial": self.Get_serial_devices})
         self.Get_serial_devices()
 
     def Set_port(self, e):
@@ -345,9 +284,9 @@ class SerialPortSelector(tk.Frame):
                 self.terminal.Terminal_msg(f"Serial connection with {device_name} has failed.", True)
 
             self.lastselect = device
-        
 
     def Get_serial_devices(self):
+        """Get serial ports for available devices"""
         available_ports = comports()
         self.devices = {}
         
@@ -358,12 +297,12 @@ class SerialPortSelector(tk.Frame):
 
     
 class Terminal(tk.LabelFrame):
-    def __init__(self, root, text=None):
-        super().__init__(root, text=text)
-        self.msgkey = ""
-        self.Build()
+    def __init__(self, root, text=None, allowcommands=True):
+        super().__init__(root.frame, text=text)
+        self.commands = {
+            "list": self.List_commands
+        }
 
-    def Build(self):
         scrollbar = tk.Scrollbar(self)
         self.terminal = tk.Text(self, wrap="word", yscrollcommand=scrollbar.set, width=30, height=10)
         self.terminal.tag_config("ERROR", foreground="red")
@@ -373,9 +312,15 @@ class Terminal(tk.LabelFrame):
         scrollbar.grid(row=0, column=1, sticky=tk.N+tk.S)
         self.terminal.config(state=tk.DISABLED)
 
-    def Setlink(self, key):
-        self.msgkey = key
+        if allowcommands:
+            self.entry = tk.Entry(self)
+            self.entry.grid(row=1, column=0, sticky="NWSE")
 
+            self.sendbutton = tk.Button(self, text="send", command=lambda: self.Run_Command(self.entry.get()))
+            self.sendbutton.grid(row=1, column=1)
+
+            self.entry.bind('<Return>', self.Entry_Run)
+        
     def Terminal_msg(self, msg, error=False):
         self.terminal.config(state=tk.NORMAL)
         if error:
@@ -383,21 +328,96 @@ class Terminal(tk.LabelFrame):
         else:
             self.terminal.insert(tk.END, f"{msg}\n")
         self.terminal.config(state=tk.DISABLED)
+    
+    def List_commands(self):
+        """Lists all the commands available in terminal."""
 
+        self.Terminal_msg("Available commands:")
+        for name, function in self.commands.items():  
+            self.Terminal_msg(f"\t{name}: {function.__doc__}")
 
-class TkLivePlot(tk.LabelFrame):
-    def __init__(self, master, text=None, interval=1000, blit=False, maxpoints=50):
-        super().__init__(master, text=text)
+    def Entry_Run(self, e):
+        self.Run_Command(self.entry.get())
+
+    def Run_Command(self, command):
+
+        self.Terminal_msg(f"Input: {command}")
+
+        # Decoder required
+        try:
+            self.commands[command]()
+        except KeyError as e:
+            self.Terminal_msg("Unkown command", True)
+
+        self.entry.delete(0, 'end')
+
+    def Add_Commands(self, commanddict):
+        self.commands.update(commanddict)
+
+class StatusLED(tk.Frame):
+    def __init__(self, root, text=None):
+        tk.Frame.__init__(self, root.frame)
+        self.text = text
+        BASEDIR = os.path.dirname(os.path.abspath(__file__))
+        self.red = tk.PhotoImage(file=BASEDIR + "/assets/greenled.PNG").subsample(7, 7) 
+        self.green = tk.PhotoImage(file=BASEDIR + "/assets/redled.PNG").subsample(7, 7) 
+
+        self.LEDlabel = tk.Label(self, image=self.red)
+        
+
+        self.state = False
+
+        if self.text != None:
+            self.textlabel = tk.Label(self, text=text)
+            self.textlabel.grid(row=0, column=0)
+            self.LEDlabel.grid(row=0, column=1)
+        else:
+            self.LEDlabel.pack()
+            
+
+    def Toggle_State(self):
+        self.state = not self.state
+
+        self.Update_label()
+
+    def Set_State(self, state):
+
+        if state == True or state == False:
+            self.state = state
+
+        else:
+            raise TypeError("State must be True or False")
+        
+        self.Update_label()
+    
+    def Update_label(self):
+        if self.state == True:
+            self.LEDlabel.config(image=self.green)
+        elif self.state == False:
+            self.LEDlabel.config(image=self.red)
+
+        else:
+            raise TypeError("State must be a boolean")
+
+    def Get_State(self):
+        return self.state
+
+class TkLivePlot(tk.Frame):
+    def __init__(self, root, interval=1000, blit=False, maxpoints=50):
+        tk.Frame.__init__(self, root)
         self.x = []
         self.y = []
         self.z = []
         self.maxpoints = maxpoints
         self.figure, self.ax = plt.subplots()
-        self.canvas = FigureCanvasTkAgg(plt.gcf(), master=master)
+        self.canvas = FigureCanvasTkAgg(plt.gcf(), master=root)
         self.ani = FuncAnimation(plt.gcf(), self.Animation, interval=interval, blit=blit)
 
     def grid(self,**kwargs):
         self.canvas.get_tk_widget().grid(kwargs)
+    
+    def pack(self,**kwargs):
+        self.canvas.get_tk_widget().pack(kwargs)
 
     def Animation(self, i):
         self.ax.cla()
@@ -417,15 +437,9 @@ class TkLivePlot(tk.LabelFrame):
         self.z = z
         self.Update()
 
-    def AppendPlot(self, x=None, y=None, z=None):
-        if x:
-            self.x.append(x)
-
-        if y:
-            self.y.append(y)
-
-        if z:
-            self.z.append(z)
+    def Appendy(self, value):
+        self.y.append(value)
+        self.Increment("x")
 
         self.Update()
 
@@ -446,7 +460,6 @@ class TkLivePlot(tk.LabelFrame):
         if variable == "z":
             pass
 
-        self.Update()
 
 class TkTable(tk.LabelFrame):
     def __init__(self, master, dataframe, text=None):

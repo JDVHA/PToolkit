@@ -6,6 +6,7 @@ from math import floor, log10, ceil
 from scipy.integrate import quad
 import numpy as np
 from scipy.special import gamma
+from scipy.optimize import curve_fit
 import warnings
 import inspect
 
@@ -635,3 +636,20 @@ def Calculate_p_value(chi, d):
     v = lambda x: (x**(d/2-1)*np.exp(-x/2))/(2**(d/2)*gamma(d/2))
     p = quad(v, chi, np.Inf)[0]
     return p
+
+
+def Remove_ramp(signal, gues=None):
+    x = np.linspace(0, len(signal), len(signal))
+    line_func = lambda x, a, b: a*x+b  
+    popt, pcov = curve_fit(line_func, x, signal, p0=gues)
+    a, b = popt
+    return signal - line_func(x, a, b)
+
+
+def smooth(y, box_pts):
+    """
+    Credits to scrx2: https://stackoverflow.com/a/26337730 
+    """
+    box = np.ones(box_pts)/box_pts
+    y_smooth = np.convolve(y, box, mode='same')
+    return y_smooth
