@@ -1,6 +1,5 @@
 import tkinter as tk
-import logging, time, os
-import threading
+import logging, time, os, sys, threading
 from matplotlib.animation import FuncAnimation
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
@@ -23,8 +22,12 @@ INIT_FASE = True
 
 
 class MainPToolkitApp(tk.Tk):
-    def __init__(self, *kwargs, **args):
+    def __init__(self, appname, *kwargs, **args):
         tk.Tk.__init__(self, *kwargs, **args)
+        self.name = appname
+        self.interfaces = []
+
+        self.protocol("WM_DELETE_WINDOW", self.StopApp)
 
     def mainloop(self):
         self.StartApp()
@@ -37,16 +40,30 @@ class MainPToolkitApp(tk.Tk):
         INIT_FASE = False
         PTOOLKITLOGGER.info(f"Just started the main application.")
 
+    def StopApp(self):
+        if tk.messagebox.askokcancel("Quit", f"Do you want to quit {self.name}?"):
+            for interface in self.interfaces:
+                interface.Stop()
+            self.destroy()
+
+    def AppendInterface(self, interface):
+        self.interfaces.append(interface)
+       
+
+
 class Interface:
     def __init__(self, master, name):
         self.classname = self.__class__.__name__
         self.name = name
+        self.master = master
         self.commands = {}
         self.keys = {}
         self.utilfuncs = ["RegisterCommand", "RegisterKey", "grid", "pack", "Post_init"]
-        self.frame = tk.LabelFrame(master, text=name)
+        self.frame = tk.LabelFrame(self.master, text=name)
         PTOOLKITLOGGER.debug(f"Just created an instance of {self.classname}.")
         PTOOLKITLOGGER.debug(f"Starting post init of an {self.classname} instance.")
+
+        self.master.AppendInterface(self)
 
         for i in dir(self):
             if not (i.startswith("_") or i.endswith("_") or i in self.utilfuncs):
@@ -56,6 +73,7 @@ class Interface:
                     self.commands[name] = getattr(self, i)
 
         PTOOLKITLOGGER.debug(f"Finished post init of an {self.classname} instance.")        
+        
 
     def RegisterCommand(name, links=[]):
         
@@ -87,10 +105,68 @@ class Interface:
     def pack(self, *args, **kwargs):
         self.frame.pack(*args, **kwargs)
 
+    def Stop(self):
+        for child in self.frame.winfo_children():
+            if issubclass(type(child), Parameter) == True:
+                child.Save()
+
 
 class Parameter:
-    def __init__(self, source):
+    def __init__(self, source, name=None, save=False):
         self.source = source
+        self.save= save
+        self.name = name
+
+    def Load(self):
+        if self.save == True and self.name !=None:
+            path = sys.path[0]
+
+
+            with open(path+"\\.state", "r") as f:
+                data = f.readlines()
+
+            if len(data) > 0:
+                for line in data:
+                    linename, value = line.split("=")
+                    if  linename == self.name:
+                        return value
+                        
+            else:
+                return None
+
+            
+
+    def Save(self):
+        if self.save == True and self.name != None:   
+            path = sys.path[0]
+            with open(path+"\\.state", "r") as f:
+                data = f.readlines()
+
+            n = 0
+            if len(data) > 0:
+                
+                for line in data:
+                    
+                    if line.split("=")[0] == self.name:
+                        
+                        data[n] = f"{self.name}={self.source()}\n"
+                        
+                        with open(path+"\\.state", "w") as f:
+                            f.writelines(data)
+
+                        # Fixes bug
+                        break
+
+                    else:
+                        with open(path+"\\.state", "a") as f:
+                            f.write(f"{self.name}={self.source()}\n")
+
+                    n += 1            
+            else:
+                with open(path+"\\.state", "a") as f:
+                    f.write(f"{self.name}={self.source()}\n")
+                    
+            
 
     def __Check__(self, otherparam):
         val1 = self.source()
@@ -217,19 +293,28 @@ class Display(tk.Frame, Parameter):
         
 
 class ParameterField(tk.Frame, Parameter):
-    def __init__(self, root, text="", unit="-", font=2, save=True):
+    def __init__(self, root, text="", unit="-", font=2, save=True, from_=-999, to=999, increment=0.1):
         tk.Frame.__init__(self, root.frame)
         
+        self.variable = tk.StringVar()
+
         self.unit = unit
         self.text = text 
         
         self.textLabel = tk.Label(self, text=self.text, font=font, anchor="w")
-        self.spinBox = tk.Spinbox(self, font=font)
+        self.spinBox = tk.Spinbox(self, font=font, from_=from_, to=to, textvariable=self.variable, increment=0.1)
         self.unitlabel = tk.Label(self, text=self.unit, font=font)
 
-        self.spinBox.insert(0, "0.0")
+        parametername = f"{root.name}:{text}[{unit}]"
+        Parameter.__init__(self, self.get, name=parametername, save=True)
 
-        Parameter.__init__(self, self.get)
+        parametervalue = self.Load()
+        if parametervalue:
+            self.variable.set(parametervalue)
+        
+        else:
+            self.variable.set("0")
+
 
         self.textLabel.grid(row=0, column=0, sticky='nesw')
         self.spinBox.grid(row=0, column=1, sticky='nesw')
@@ -328,6 +413,7 @@ class Terminal(tk.LabelFrame):
         else:
             self.terminal.insert(tk.END, f"{msg}\n")
         self.terminal.config(state=tk.DISABLED)
+        self.terminal.see("end")
     
     def List_commands(self):
         """Lists all the commands available in terminal."""
@@ -359,8 +445,9 @@ class StatusLED(tk.Frame):
         tk.Frame.__init__(self, root.frame)
         self.text = text
         BASEDIR = os.path.dirname(os.path.abspath(__file__))
-        self.red = tk.PhotoImage(file=BASEDIR + "/assets/greenled.PNG").subsample(7, 7) 
-        self.green = tk.PhotoImage(file=BASEDIR + "/assets/redled.PNG").subsample(7, 7) 
+        
+        self.red = tk.PhotoImage(file=BASEDIR + "\\assets\\greenled.PNG", master=self).subsample(7, 7) 
+        self.green = tk.PhotoImage(file=BASEDIR + "\\assets\\redled.PNG", master=self).subsample(7, 7) 
 
         self.LEDlabel = tk.Label(self, image=self.red)
         
@@ -402,7 +489,7 @@ class StatusLED(tk.Frame):
     def Get_State(self):
         return self.state
 
-class TkLivePlot(tk.Frame):
+class Plot(tk.Frame):
     def __init__(self, root, interval=1000, blit=False, maxpoints=50):
         tk.Frame.__init__(self, root)
         self.x = []
@@ -412,7 +499,15 @@ class TkLivePlot(tk.Frame):
         self.figure, self.ax = plt.subplots()
         self.canvas = FigureCanvasTkAgg(plt.gcf(), master=root)
         self.ani = FuncAnimation(plt.gcf(), self.Animation, interval=interval, blit=blit)
+        self.ax.plot(self.x, self.y)
 
+
+    def set_xlabel(self, *args, **kwargs):
+        self.ax.set_xlabel(*args, **kwargs)
+
+    def set_ylabel(self, *args, **kwargs):
+        self.ax.set_ylabel(*args, **kwargs)
+       
     def grid(self,**kwargs):
         self.canvas.get_tk_widget().grid(kwargs)
     
@@ -420,7 +515,8 @@ class TkLivePlot(tk.Frame):
         self.canvas.get_tk_widget().pack(kwargs)
 
     def Animation(self, i):
-        self.ax.cla()
+        for artist in plt.gca().lines + plt.gca().collections:
+            artist.remove()
         self.ax.plot(self.x, self.y)
 
     def Update(self): 

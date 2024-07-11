@@ -1,4 +1,11 @@
-from LabControl import MainPToolkitApp, Interface, ParameterField, SerialPortSelector, Terminal, Display, TkLivePlot, StatusLED, TkTable
+from LabControl import Interface
+import tkinter as tk
+from tkinter import ttk
+import sys
+
+sys.path.append("dependencies/")
+
+from LabControl import MainPToolkitApp, Interface, ParameterField, SerialPortSelector, Terminal, Display, Plot, StatusLED, TkTable
 import tkinter as tk
 import math, serial, random
 
@@ -23,7 +30,7 @@ class Arduino(Interface):
         self.actualspeed = Display(self, text="Actual speed:", unit="m/s")
         self.actualspeed.pack()
 
-        self.button1 = tk.Button(self.frame, text="A", command=self.MyMethod)
+        self.button1 = tk.Button(self.frame, text="ABC", command=self.MyMethod)
         self.button1.pack()
 
         self.LED = StatusLED(self, text="Status:")
@@ -31,7 +38,9 @@ class Arduino(Interface):
 
         self.terminal.pack()
 
-        self.plot = TkLivePlot(self.frame)
+        self.plot = Plot(self.frame)
+        self.plot.set_xlabel("Test")
+        self.plot.set_ylabel("Test")
         self.plot.pack()
         
         self.RegisterKey("Key1", self.terminal.Terminal_msg)
@@ -48,15 +57,9 @@ class Arduino(Interface):
     
     @Interface.RegisterCommand("test1", ["Key2"])
     def MyMethod1(self):
-        return 1
+        return self.speed
 
 
 
-root = MainPToolkitApp()
-
-A = Arduino(root, "Arduino1")
-A.pack()
-
-root.mainloop()
 
 

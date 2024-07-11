@@ -33,6 +33,7 @@ P = PToolkit(console_path, arguments)
 
 @P.Add_command("newproject")
 def Create_new_project(scriptpath, terminalpath, arguments):
+    """Create a new project. Arguments: <projectname>"""
     try:
         shutil.copytree(scriptpath+"\\Labcontrol\\newproject", terminalpath+f"\\{arguments[0]}")
         print(f"SUCCES: Created project {arguments[0]}")
@@ -45,6 +46,7 @@ def Create_new_project(scriptpath, terminalpath, arguments):
 
 @P.Add_command("newinterface")
 def Create_new_interface(scriptpath, terminalpath, arguments):
+    """Create a new interface. Arguments: <interfacename>"""
     name = arguments[0]
     try:
         shutil.copyfile(scriptpath+"\\Labcontrol\\newproject\\interfaces\\blankinterface.py", terminalpath+f"\\{name}.py")
@@ -55,6 +57,13 @@ def Create_new_interface(scriptpath, terminalpath, arguments):
 
     except Exception as e:
         print("ERROR: Interface already exists")
+
+@P.Add_command("help")
+def Help_PToolkit(scriptpath, terminalpath, arguments):
+    """Help command lists all commands available"""
+    print("Commands: ")
+    for name, func in P.terminalcommands.items(): 
+        print(f"\t{name}: {func.__doc__}")
 
 
 
