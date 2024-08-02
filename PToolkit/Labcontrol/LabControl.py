@@ -3,6 +3,7 @@ import logging, time, os, sys, threading
 from matplotlib.animation import FuncAnimation
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
 from tkinter import ttk
 from serial.tools.list_ports import comports
 
@@ -10,7 +11,6 @@ logging.basicConfig(
     level=logging.DEBUG,
     format="%(asctime)s [%(levelname)s] %(message)s",
     handlers=[
-        #logging.FileHandler("debug.log"),
         logging.StreamHandler()
     ]
 )
@@ -26,6 +26,7 @@ class MainPToolkitApp(tk.Tk):
         tk.Tk.__init__(self, *kwargs, **args)
         self.name = appname
         self.interfaces = []
+        self.interfacenames = []
 
         self.protocol("WM_DELETE_WINDOW", self.StopApp)
 
@@ -38,18 +39,23 @@ class MainPToolkitApp(tk.Tk):
         if not INIT_FASE:
             raise SystemError("""INIT_FASE was false. Possible causes: INIT_FASE was changed in the program by the user. Or a second App was created, a maximum of 1 App may exist per program.""")
         INIT_FASE = False
+
         PTOOLKITLOGGER.info(f"Just started the main application.")
 
     def StopApp(self):
         if tk.messagebox.askokcancel("Quit", f"Do you want to quit {self.name}?"):
             for interface in self.interfaces:
                 interface.Stop()
+                del interface
             self.destroy()
 
     def AppendInterface(self, interface):
-        self.interfaces.append(interface)
+        if interface.name in self.interfacenames:
+            raise NameError(f"Interface with name: {interface.name} already exists.")
+        else:
+            self.interfacenames.append(interface.name)
+            self.interfaces.append(interface)
        
-
 
 class Interface:
     def __init__(self, master, name):
@@ -111,6 +117,8 @@ class Interface:
                 child.Save()
 
 
+
+
 class Parameter:
     def __init__(self, source, name=None, save=False):
         self.source = source
@@ -121,15 +129,21 @@ class Parameter:
         if self.save == True and self.name !=None:
             path = sys.path[0]
 
+            try:
+                with open(path+"\\.state", "r") as f:
+                    data = f.readlines()
 
-            with open(path+"\\.state", "r") as f:
-                data = f.readlines()
+            except FileNotFoundError as e:
+                raise FileNotFoundError("Cannot find .state file")
 
             if len(data) > 0:
                 for line in data:
-                    linename, value = line.split("=")
-                    if  linename == self.name:
-                        return value
+                    if "=" in line:
+                        linename, value = line.rstrip().split("=")
+                        if  linename == self.name:
+                            return value
+                    else:
+                        raise IOError("Corrupt state file. Remove state file")
                         
             else:
                 return None
@@ -139,8 +153,12 @@ class Parameter:
     def Save(self):
         if self.save == True and self.name != None:   
             path = sys.path[0]
-            with open(path+"\\.state", "r") as f:
-                data = f.readlines()
+
+            try:
+                with open(path+"\\.state", "r") as f:
+                    data = f.readlines()
+            except FileNotFoundError as e:
+                raise FileNotFoundError("Cannot find .state file")
 
             n = 0
             if len(data) > 0:
@@ -263,22 +281,224 @@ class Parameter:
     def __str__(self):
         val = self.source()
         return str(val)
+    
+
+class VerticalAllign(tk.Frame):
+    def __init__(self, root):
+        tk.Frame.__init__(self, root.frame)
+        self.frame = root.frame
+        self.name = root.name
+
+        self.widget_grid = []
+    
+
+    def Make_Grid(self):
+        m, n = 0, 0
+        for row in self.widget_grid:
+
+            for widget in row:
+                widget.grid(row=m, column=n, sticky='nesw')
+                n += 1
+
+            n = 0
+            m += 1
+
+
+    def pack(self, *args, **kwargs):
+        self.Make_Grid()
+        super(tk.Frame, self).pack(*args, **kwargs)
+
+    def grid(self, *args, **kwargs):
+        self.Make_Grid()
+        super(tk.Frame, self).grid(*args, **kwargs)
+
+class PToolkitWidgetBase:
+    def __init__(self, master, content):
+        
+        if isinstance(master, VerticalAllign):
+            widgets = content
+        
+        else:
+            pass
+
+
+    def __new___(cls, *args, **kwargs):
+        pass
+        
+
+class KeyBoard(tk.Frame):
+    def __init__(self, root, grid, textgrid=None, commandgrid=None, imagegrid=None):    
+        tk.Frame.__init__(self, root.frame)
+
+        if isinstance(root, VerticalAllign):
+            master = root
+        
+        else:
+            master = self
+
+        if isinstance(root, VerticalAllign):
+            widgets = [
+            ]
+            master.widget_grid.append(widgets)
+
+        else:
+            pass
+
+        self.widgets = []
+        m = len(grid)
+        n = len(grid[0])
+
+        
+        unique_id = []
+        for j in range(m):
+            for i in range(n):
+                row = []
+                id = grid[j][i]
+                
+                if id == 0:
+                    row.append(None)        
+
+                elif id > 0:
+                    if not id in unique_id:
+                        unique_id.append(id)
+                    
+                    try:
+                        text = textgrid[j][i]
+                    except:
+                        text = None
+
+                    try:
+                        command = commandgrid[j][i]
+                    except:
+                        command = None
+
+                    try:
+                        image = imagegrid[j][i]
+                    except:
+                        image = None
+                    
+                    button = tk.Button(
+                            self,
+                            text=text,
+                            command=command,
+                            image=image
+                        )
+                    
+                    # Fixes a bug
+                    button.image = image
+
+                    row.append(button)
+                    button.grid(row=j, column=i, sticky="nesw")
+
+class ArrowKeyPad(KeyBoard):
+    def __init__(self, root, commandgrid=None, size=(4, 4), includehome=False, buttons=4):
+        
+        BASEDIR = os.path.dirname(os.path.abspath(__file__))
+
+        ICONSIZE = size
+
+        if includehome == True:
+            home = 1
+
+        else:
+            home = 0
+
+        textgrid = [
+                [None, None, None],
+                [None, "Home", None],
+                [None, None, None]
+            ]
+
+        if buttons == 4:
+            grid = [
+                [0, 1, 0],
+                [1, home, 1],
+                [0, 1, 0]
+            ]
+        elif buttons == 8:
+            grid = [
+                [1, 1, 1],
+                [1, home, 1],
+                [1, 1, 1]
+            ]
+
+        upkey = tk.PhotoImage(file=BASEDIR + "\\assets\\toparrow.png").subsample(*ICONSIZE) 
+        downkey = tk.PhotoImage(file=BASEDIR + "\\assets\\downarrow.png").subsample(*ICONSIZE) 
+        rightkey = tk.PhotoImage(file=BASEDIR + "\\assets\\rightarrow.png").subsample(*ICONSIZE) 
+        leftkey = tk.PhotoImage(file=BASEDIR + "\\assets\\leftarrow.png").subsample(*ICONSIZE) 
+
+        toprightkey = tk.PhotoImage(file=BASEDIR + "\\assets\\toprightarrow.png").subsample(*ICONSIZE) 
+        topleftkey = tk.PhotoImage(file=BASEDIR + "\\assets\\topleftarrow.png").subsample(*ICONSIZE) 
+        downrightkey = tk.PhotoImage(file=BASEDIR + "\\assets\\downrightarrow.png").subsample(*ICONSIZE) 
+        downleftkey = tk.PhotoImage(file=BASEDIR + "\\assets\\downleftarrow.png").subsample(*ICONSIZE) 
+
+
+        imagegrid = [
+            [topleftkey, upkey, toprightkey],
+            [leftkey, None, rightkey],
+            [downleftkey, downkey, downrightkey]
+        ]
+
+        print(upkey)
+        KeyBoard.__init__(self, root, grid, imagegrid=imagegrid, textgrid=textgrid)
+
+
+        
+        
+
+    
+
+
+class Button(tk.Button):
+    def __init__(self, root, *args, **kwargs):
+               
+
+        if isinstance(root, VerticalAllign):
+            master = root
+            self.Button = tk.Button(master, *args, **kwargs)
+            widgets = [
+                self.Button
+            ]
+            master.widget_grid.append(widgets)
+
+        else:
+            tk.Button.__init__(self, root, *args, **kwargs) 
+        
+        
+
+
 
 class Display(tk.Frame, Parameter):
     def __init__(self, root, text="", unit="-", font=2):
         tk.Frame.__init__(self, root.frame)
+
+        if isinstance(root, VerticalAllign):
+            master = root
+        
+        else:
+            master = self
+
+
         self.unit = unit
         self.text = text 
 
         self.textvariable = tk.StringVar()
 
-        self.textlabel = tk.Label(self, text=self.text, font=font, anchor="w")
-        self.displaylabel = tk.Label(self, textvariable=self.textvariable, font=font)
-        self.unitlabel = tk.Label(self, text=self.unit, font=font)
+        self.textlabel = tk.Label(master, text=self.text, font=font, anchor="w")
+        self.displaylabel = tk.Label(master, textvariable=self.textvariable, font=font)
+        self.unitlabel = tk.Label(master, text=self.unit, font=font)
+        if isinstance(root, VerticalAllign):
+            widgets = [
+                self.textlabel,
+                self.displaylabel,
+                self.unitlabel
+            ]
+            master.widget_grid.append(widgets)
 
-        self.textlabel.grid(row=0, column=0)
-        self.displaylabel.grid(row=0, column=1)
-        self.unitlabel.grid(row=0, column=2)
+        else:
+            self.textlabel.grid(row=0, column=0)
+            self.displaylabel.grid(row=0, column=1)
+            self.unitlabel.grid(row=0, column=2)
 
         self.textvariable.set("0")
         Parameter.__init__(self, self.get)
@@ -295,20 +515,26 @@ class Display(tk.Frame, Parameter):
 class ParameterField(tk.Frame, Parameter):
     def __init__(self, root, text="", unit="-", font=2, save=True, from_=-999, to=999, increment=0.1):
         tk.Frame.__init__(self, root.frame)
+        if isinstance(root, VerticalAllign):
+            master = root
+        
+        else:
+            master = self
         
         self.variable = tk.StringVar()
 
         self.unit = unit
         self.text = text 
         
-        self.textLabel = tk.Label(self, text=self.text, font=font, anchor="w")
-        self.spinBox = tk.Spinbox(self, font=font, from_=from_, to=to, textvariable=self.variable, increment=0.1)
-        self.unitlabel = tk.Label(self, text=self.unit, font=font)
+        self.textLabel = tk.Label(master, text=self.text, font=font, anchor="w")
+        self.spinBox = tk.Spinbox(master, font=font, from_=from_, to=to, textvariable=self.variable, increment=0.1)
+        self.unitlabel = tk.Label(master, text=self.unit, font=font)
 
         parametername = f"{root.name}:{text}[{unit}]"
         Parameter.__init__(self, self.get, name=parametername, save=True)
 
         parametervalue = self.Load()
+
         if parametervalue:
             self.variable.set(parametervalue)
         
@@ -316,9 +542,18 @@ class ParameterField(tk.Frame, Parameter):
             self.variable.set("0")
 
 
-        self.textLabel.grid(row=0, column=0, sticky='nesw')
-        self.spinBox.grid(row=0, column=1, sticky='nesw')
-        self.unitlabel.grid(row=0, column=2, sticky='nesw')
+        if isinstance(root, VerticalAllign):
+            widgets = [
+                self.textLabel,
+                self.spinBox,
+                self.unitlabel
+            ]
+            master.widget_grid.append(widgets)
+
+        else:
+            self.textLabel.grid(row=0, column=0, sticky='nesw')
+            self.spinBox.grid(row=0, column=1, sticky='nesw')
+            self.unitlabel.grid(row=0, column=2, sticky='nesw')
     
 
     def get(self):
@@ -328,26 +563,39 @@ class SerialPortSelector(tk.Frame):
     
     def __init__(self, root, serial, text="Serial devices: ", terminal=None):
         tk.Frame.__init__(self, root.frame)
+        if isinstance(root, VerticalAllign):
+            master = root
+        
+        else:
+            master = self
         
         self.serial = serial
         self.terminal = terminal
         self.lastselect = None
 
-        self.Label = tk.Label(self, text=text)
-        self.ComboBox = ttk.Combobox(self)
-        self.ComboBox.bind("<<ComboboxSelected>>", self.Set_port)
-        self.Button = tk.Button(self, text="\u27F3", command=self.Get_serial_devices)
+        self.label = tk.Label(master, text=text, anchor="w")
+        self.combobox = ttk.Combobox(master)
+        self.combobox.bind("<<ComboboxSelected>>", self.Set_port)
+        self.button = tk.Button(master, text="\u27F3", command=self.Get_serial_devices)
         
+        if isinstance(root, VerticalAllign):
+            widgets = [
+                self.label,
+                self.combobox,
+                self.button
+            ]
+            master.widget_grid.append(widgets)
+        else:
+            self.label.grid(row=0, column=0)
+            self.combobox.grid(row=0, column=1)
+            self.button.grid(row=0, column=2)
 
-        self.Label.grid(row=0, column=0)
-        self.ComboBox.grid(row=0, column=1)
-        self.Button.grid(row=0, column=2)
         if self.terminal != None:
             self.terminal.Add_Commands({"reloadserial": self.Get_serial_devices})
         self.Get_serial_devices()
 
     def Set_port(self, e):
-        device = self.ComboBox.current()
+        device = self.combobox.current()
         if self.lastselect == device:
             self.serial.close()
        
@@ -378,7 +626,7 @@ class SerialPortSelector(tk.Frame):
         for port, device, _ in sorted(available_ports):
             self.devices[device] = port
 
-        self.ComboBox['values'] = list(self.devices.keys())
+        self.combobox['values'] = list(self.devices.keys())
 
     
 class Terminal(tk.LabelFrame):
@@ -450,8 +698,6 @@ class StatusLED(tk.Frame):
         self.green = tk.PhotoImage(file=BASEDIR + "\\assets\\redled.PNG", master=self).subsample(7, 7) 
 
         self.LEDlabel = tk.Label(self, image=self.red)
-        
-
         self.state = False
 
         if self.text != None:
@@ -490,17 +736,18 @@ class StatusLED(tk.Frame):
         return self.state
 
 class Plot(tk.Frame):
-    def __init__(self, root, interval=1000, blit=False, maxpoints=50):
+    def __init__(self, root, interval=100, blit=False, maxpoints=50):
         tk.Frame.__init__(self, root)
         self.x = []
         self.y = []
         self.z = []
         self.maxpoints = maxpoints
-        self.figure, self.ax = plt.subplots()
-        self.canvas = FigureCanvasTkAgg(plt.gcf(), master=root)
-        self.ani = FuncAnimation(plt.gcf(), self.Animation, interval=interval, blit=blit)
-        self.ax.plot(self.x, self.y)
-
+        self.figure = Figure(dpi=100)
+        self.ax = self.figure.add_subplot(111)
+        self.canvas = FigureCanvasTkAgg(self.figure, master=root)
+        self.plot = self.ax.plot(self.x, self.y)[0]
+        self.ani = FuncAnimation(self.figure, self.Animation, interval=interval, blit=blit)
+        
 
     def set_xlabel(self, *args, **kwargs):
         self.ax.set_xlabel(*args, **kwargs)
@@ -517,7 +764,7 @@ class Plot(tk.Frame):
     def Animation(self, i):
         for artist in plt.gca().lines + plt.gca().collections:
             artist.remove()
-        self.ax.plot(self.x, self.y)
+        self.ax.plot(self.x, self.y, c="b")
 
     def Update(self): 
         if len(self.x) >= self.maxpoints + 1:
@@ -526,18 +773,18 @@ class Plot(tk.Frame):
         if len(self.y) >= self.maxpoints + 1:
             self.y = self.y[1:self.maxpoints + 1]
 
-
     def UpdatePlot(self, x=[], y=[], z=[]):
         self.x = x
         self.y = y
         self.z = z
         self.Update()
-
+        
     def Appendy(self, value):
         self.y.append(value)
         self.Increment("x")
 
         self.Update()
+        
 
     def Increment(self, variable):
         if variable == "x":
@@ -640,3 +887,270 @@ class TkTable(tk.LabelFrame):
         E.destroy()
         self.dataframe[col][row] = var.get()
         self.Update()
+
+class BaseThread(threading.Thread):
+    """
+    Base class for the producer-consumer threads. 
+    """
+    def __init__(self, name, queue, interval=1):
+        """
+        Initialization of the BaseThread class
+
+        Parameters
+        ----------
+        queue: queue.Queue
+        The queue to get and store data 
+
+        interval: int
+        Interval between operations in seconds
+
+        Returns
+        -------
+        None
+        """
+        
+        # Init base class
+        threading.Thread.__init__(self)
+
+        # Store queue and interval in object
+        self.interval = interval
+        self.queue = queue
+
+        # Create active and alive parameters
+        self.active = False
+        self.alive = True
+        self.name = name
+
+    def run(self):
+        """
+        Mainloop of the thread
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
+        # Start loop aslong as the thread is alive
+        while self.alive:
+
+            # Check if the thread is actively used
+            if self.active == True:
+
+                # Execute the inner thread
+                self.Thread_inside()
+
+                # Sleep if needed
+                if self.interval != None:
+                    time.sleep(self.interval)
+                
+                # Debug msg
+                if PTOOLKITLOGGER.level == logging.DEBUG:
+                    time.sleep(0.1)
+                    PTOOLKITLOGGER.debug(f"Thread {self.name} is reading from a queue with current size: {self.queue.qsize()}.")
+        
+        # Debug msg   
+        PTOOLKITLOGGER.debug(f"Killing thread: {self.name}")
+
+        return
+
+    def Thread_inside(self):
+        """
+        Inside of the thread method in BaseThread no use
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
+
+
+    def Start(self):
+        """
+        Method to start or restart the thread
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
+
+        PTOOLKITLOGGER.debug(f"Starting thread: {self.name}")
+        # Set the thread active
+        self.active = True
+
+        # Try to start the thread from the orginal if already active skip
+        try:
+            super(BaseThread, self).start()
+        except:
+            pass
+
+    def Stop(self):
+        """
+        Method to stop the thread
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
+        PTOOLKITLOGGER.debug(f"Stopping thread: {self.name}")
+        self.active = False
+
+    def Kill(self):
+        """
+        Method to kill the thread
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
+        self.alive = False
+
+    def Toggle(self):
+        """
+        Method to toggle the thread
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
+        if self.active == True:
+            self.Stop()
+
+        elif self.active == False:
+            self.Start()
+
+
+    
+
+class ProducerThread(BaseThread):
+    """
+    A class that allows for data generation or data acquisition
+    """
+    def __init__(self, name, generationfunction, queue, interval=1, terminal=None):
+        """
+        Initialization of the ProducerThread class
+
+        Parameters
+        ----------
+        generationfunction: function
+        A function that returns a peace of data to put into the queue
+
+        queue: queue.Queue
+        The queue to get and store data 
+
+        interval: int
+        Interval between operations in seconds
+
+        terminal: PToolkit terminal object
+        Termianl to print messages to
+
+        Returns
+        -------
+        None
+        """
+        BaseThread.__init__(self, name, queue, interval)
+        self.generationfunction = generationfunction
+        self.terminal = terminal
+        
+
+    def Thread_inside(self):
+        """
+        Inside of the thread method. Executes the generationfunction and puts the
+        result in the queue.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
+
+        # Check if queue is full
+        if not self.queue.full():
+
+            # Execute the generationfunction and add the data to the queue
+            data = self.generationfunction()
+            self.queue.put(data)    
+
+        else:
+            msg = f"Data overflow in queue, thread {self.name} cannot add more data. Data is currently being lost!!! Increase queue size or increase processing speed."
+            if self.terminal != None:
+                self.terminal.Terminal_msg(msg, True)    
+            
+            PTOOLKITLOGGER.warning(msg)
+                
+class ConsumerThread(BaseThread):
+    """
+    A class that allows for data processing from a queue
+    """
+    def __init__(self, name, consumerfunction, queue, interval=None, terminal=None):
+        """
+        Initialization of the ConsumerThread class
+
+        Parameters
+        ----------
+        consumerfunction: function
+        A function that returns consumes a piece of data from the queue
+        and processes it.
+
+        queue: queue.Queue
+        The queue to get and store data 
+
+        interval: int
+        Interval between operations in seconds
+
+        terminal: PToolkit terminal object
+        Termianl to print messages to
+
+        Returns
+        -------
+        None
+        """
+        BaseThread.__init__(self, name, queue, interval)
+        self.consumerfunction = consumerfunction
+        self.terminal = terminal
+        
+
+    def Thread_inside(self):
+        """
+        Inside of the thread method. Executes the generationfunction and puts the
+        result in the queue
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
+
+        # Check if queue is empty
+        if not self.queue.empty():
+
+            # Get data from the queue and process it
+            data = self.queue.get()
+            self.consumerfunction(data)

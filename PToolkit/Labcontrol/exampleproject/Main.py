@@ -1,6 +1,8 @@
 # Configure some important things
-import sys, os, logging
+import logging.handlers
+import sys, os, logging, datetime
 BASEDIR = os.path.dirname(os.path.abspath(__file__))
+APPNAME = "example"
 
 # Remove---------------
 sys.path.append(os.path.dirname(BASEDIR))
@@ -8,7 +10,10 @@ sys.path.append(os.path.dirname(BASEDIR))
 from LabControl import MainPToolkitApp, PTOOLKITLOGGER
 
 # Configuring the logger
-PTOOLKITLOGGER.setLevel(logging.INFO)
+logging.getLogger('matplotlib.font_manager').disabled = True
+LOGFILENAME = BASEDIR + f"\\log\\{APPNAME}{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.log"
+PTOOLKITLOGGER.setLevel(logging.DEBUG)
+PTOOLKITLOGGER.addHandler(logging.FileHandler(LOGFILENAME))
 
 # Loading the interfaces
 sys.path.append(BASEDIR + "\\interfaces")
@@ -16,13 +21,11 @@ sys.path.append(BASEDIR + "\\interfaces")
 # Your application
 # ------------------------------------------------------------------------------------------------
 from Arduino import Arduino
-
-APPNAME = "example"
         
 root = MainPToolkitApp(APPNAME)
 
 A = Arduino(root, "Arduino1")
-A.pack()
+A.grid(row=0, column=0)
 
 if __name__ == "__main__":
     root.mainloop()
