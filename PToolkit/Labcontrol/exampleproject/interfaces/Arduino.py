@@ -39,44 +39,39 @@ class Arduino(Interface):
 
         self.terminal.grid(row=3, column=0, sticky="n")
 
-        self.plot = Plot(self.frame)
+        self.plot = Plot(self.frame, diplayfps=True)
         self.plot.set_xlabel("Test")
         self.plot.set_ylabel("Test")
         self.plot.grid(row=0, column=1, rowspan=4, sticky="n")
-        
-        self.RegisterKey("Key1", self.terminal.Terminal_msg)
-        self.RegisterKey("Key2", lambda x: print(x, 1))
-        self.terminal.Add_Commands(self.commands)
         
         #KeyBoard(self, 
         #            grid=[[1, 0, 1]], textgrid=[["a", "b", "c"]]
         #        ).pack()
         #
-        #ArrowKeyPad(self,includehome=True, buttons=8).pack()
-        Q = queue.Queue(10)
-        C = ConsumerThread("Thread1", self.plot.Appendy, Q)        
-        P = ProducerThread("Thread2", self.ReadArduino, Q)
-        #C.Start()
-       
+        ArrowKeyPad(self,includehome=True, design="*").grid(row=5, column=0)
 
+
+        self.terminal.Add_Command("test1", self.MyMethod)
+        
+        Q = queue.Queue(10)
+        C = ConsumerThread("Thread1", self.plot.Appendy, Q, terminal=self.terminal, interval=0.1)        
+        P = ProducerThread("Thread2", self.ReadArduino, Q, terminal=self.terminal, interval=0.1)
+        C.Start()
         self.startacq = tk.Button(self.frame, text="on/off", command=P.Toggle)
         self.startacq.grid(row=4, column=0)
 
-    @Interface.RegisterCommand("test", ["Key1", "Key2"])
     def MyMethod(self):
         self.actualspeed.set(random.randint(1, 10))
         self.plot.Appendy(random.randint(1, 10))
         self.LED.Toggle_State()
         return math.cos(self.speed)
     
-    @Interface.RegisterCommand("test1", ["Key2"])
     def MyMethod1(self):
 
         data = self.serial.readline()
         self.plot.Appendy(int(data))
         return self.speed
     
-    @Interface.RegisterCommand("test1", ["Key2"])
     def ReadArduino(self):
         data = self.serial.readline()
         return float(data)

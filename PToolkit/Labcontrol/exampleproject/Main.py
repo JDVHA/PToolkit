@@ -12,7 +12,7 @@ from LabControl import MainPToolkitApp, PTOOLKITLOGGER
 # Configuring the logger
 logging.getLogger('matplotlib.font_manager').disabled = True
 LOGFILENAME = BASEDIR + f"\\log\\{APPNAME}{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.log"
-PTOOLKITLOGGER.setLevel(logging.DEBUG)
+PTOOLKITLOGGER.setLevel(logging.INFO)
 PTOOLKITLOGGER.addHandler(logging.FileHandler(LOGFILENAME))
 
 # Loading the interfaces

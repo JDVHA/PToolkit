@@ -5,6 +5,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from tkinter import ttk
+import numpy as np
 from serial.tools.list_ports import comports
 
 logging.basicConfig(
@@ -27,7 +28,7 @@ class MainPToolkitApp(tk.Tk):
         self.name = appname
         self.interfaces = []
         self.interfacenames = []
-
+        self.exitfunc = lambda: print("")
         self.protocol("WM_DELETE_WINDOW", self.StopApp)
 
     def mainloop(self):
@@ -42,8 +43,12 @@ class MainPToolkitApp(tk.Tk):
 
         PTOOLKITLOGGER.info(f"Just started the main application.")
 
+    def Set_ExitFunc(self, func):
+        self.exitfunc = func
+
     def StopApp(self):
         if tk.messagebox.askokcancel("Quit", f"Do you want to quit {self.name}?"):
+            self.exitfunc()
             for interface in self.interfaces:
                 interface.Stop()
                 del interface
@@ -71,12 +76,11 @@ class Interface:
 
         self.master.AppendInterface(self)
 
-        for i in dir(self):
-            if not (i.startswith("_") or i.endswith("_") or i in self.utilfuncs):
-                if callable(getattr(self, i)):
-                    name = getattr(self, i)()
-
-                    self.commands[name] = getattr(self, i)
+        #for i in dir(self):
+        #    if not (i.startswith("_") or i.endswith("_") or i in self.utilfuncs):
+        #        if callable(getattr(self, i)):
+        #            name = getattr(self, i)()
+        #            self.commands[name] = getattr(self, i)
 
         PTOOLKITLOGGER.debug(f"Finished post init of an {self.classname} instance.")        
         
@@ -391,7 +395,7 @@ class KeyBoard(tk.Frame):
                     button.grid(row=j, column=i, sticky="nesw")
 
 class ArrowKeyPad(KeyBoard):
-    def __init__(self, root, commandgrid=None, size=(4, 4), includehome=False, buttons=4):
+    def __init__(self, root, commandgrid=None, size=(4, 4), includehome=False, design="*"):
         
         BASEDIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -403,24 +407,35 @@ class ArrowKeyPad(KeyBoard):
         else:
             home = 0
 
-        textgrid = [
-                [None, None, None],
-                [None, "Home", None],
-                [None, None, None]
-            ]
-
-        if buttons == 4:
+        if design == "+":
             grid = [
                 [0, 1, 0],
                 [1, home, 1],
                 [0, 1, 0]
             ]
-        elif buttons == 8:
+        elif design == "*":
             grid = [
                 [1, 1, 1],
                 [1, home, 1],
                 [1, 1, 1]
             ]
+
+        elif design == "<>":
+            grid =[
+                [0, 0, 0],
+                [1, home, 1],
+                [0, 0, 0]
+            ]
+        elif design == "v^":
+            grid =[
+                [0, 1, 0],
+                [0, home, 0],
+                [0, 1, 0]
+            ]
+
+        else:
+            raise NameError(f"{design} is a unkown design type only: *, +, <> and v^ are available")
+
 
         upkey = tk.PhotoImage(file=BASEDIR + "\\assets\\toparrow.png").subsample(*ICONSIZE) 
         downkey = tk.PhotoImage(file=BASEDIR + "\\assets\\downarrow.png").subsample(*ICONSIZE) 
@@ -431,16 +446,15 @@ class ArrowKeyPad(KeyBoard):
         topleftkey = tk.PhotoImage(file=BASEDIR + "\\assets\\topleftarrow.png").subsample(*ICONSIZE) 
         downrightkey = tk.PhotoImage(file=BASEDIR + "\\assets\\downrightarrow.png").subsample(*ICONSIZE) 
         downleftkey = tk.PhotoImage(file=BASEDIR + "\\assets\\downleftarrow.png").subsample(*ICONSIZE) 
-
+        homebutton = tk.PhotoImage(file=BASEDIR + "\\assets\\homebutton.png").subsample(*ICONSIZE)
 
         imagegrid = [
             [topleftkey, upkey, toprightkey],
-            [leftkey, None, rightkey],
+            [leftkey, homebutton, rightkey],
             [downleftkey, downkey, downrightkey]
         ]
 
-        print(upkey)
-        KeyBoard.__init__(self, root, grid, imagegrid=imagegrid, textgrid=textgrid)
+        KeyBoard.__init__(self, root, grid, imagegrid=imagegrid)
 
 
         
@@ -591,7 +605,8 @@ class SerialPortSelector(tk.Frame):
             self.button.grid(row=0, column=2)
 
         if self.terminal != None:
-            self.terminal.Add_Commands({"reloadserial": self.Get_serial_devices})
+            self.terminal.Add_Command("reloadserial", self.Get_serial_devices)
+            
         self.Get_serial_devices()
 
     def Set_port(self, e):
@@ -685,8 +700,8 @@ class Terminal(tk.LabelFrame):
 
         self.entry.delete(0, 'end')
 
-    def Add_Commands(self, commanddict):
-        self.commands.update(commanddict)
+    def Add_Command(self, name, function):
+        self.commands[name] = function
 
 class StatusLED(tk.Frame):
     def __init__(self, root, text=None):
@@ -736,16 +751,25 @@ class StatusLED(tk.Frame):
         return self.state
 
 class Plot(tk.Frame):
-    def __init__(self, root, interval=100, blit=False, maxpoints=50):
+    def __init__(self, root, interval=10, blit=False, maxpoints=50, ylim=(0, 10), diplayfps=False):
         tk.Frame.__init__(self, root)
         self.x = []
         self.y = []
-        self.z = []
         self.maxpoints = maxpoints
-        self.figure = Figure(dpi=100)
+        self.figure = plt.figure()
         self.ax = self.figure.add_subplot(111)
+        self.FPS_DISPLAY = diplayfps
+        
+        
+        self.line, = self.ax.plot([], lw=3)
+        self.ax.set_ylim(*ylim)
+        self.ax.set_xlim(0, self.maxpoints)
+        self.text = self.ax.text(0, ylim[1]-0.5, "")
+        self.figure.canvas.draw()
+        self.t_start = time.time()
+        self.axbackground = self.figure.canvas.copy_from_bbox(self.ax.bbox)
+        
         self.canvas = FigureCanvasTkAgg(self.figure, master=root)
-        self.plot = self.ax.plot(self.x, self.y)[0]
         self.ani = FuncAnimation(self.figure, self.Animation, interval=interval, blit=blit)
         
 
@@ -762,9 +786,28 @@ class Plot(tk.Frame):
         self.canvas.get_tk_widget().pack(kwargs)
 
     def Animation(self, i):
-        for artist in plt.gca().lines + plt.gca().collections:
-            artist.remove()
-        self.ax.plot(self.x, self.y, c="b")
+        # Improved animation speed achieved using following stacoverflow example:
+        # https://stackoverflow.com/a/40139416
+        self.Update()
+       
+        self.line.set_data(self.x, self.y)
+        
+        if PTOOLKITLOGGER.level == logging.DEBUG or self.FPS_DISPLAY:
+            fps = str(np.round((i+1) / (time.time() - self.t_start), 0)).replace(".0", "")
+            tx = f' Figure frame rate: {fps} fps'
+            self.text.set_text(tx)
+
+        self.figure.canvas.restore_region(self.axbackground)
+
+        self.ax.draw_artist(self.line)
+        if PTOOLKITLOGGER.level == logging.DEBUG or self.FPS_DISPLAY:
+            self.ax.draw_artist(self.text)
+
+        self.figure.canvas.blit(self.ax.bbox)
+
+        self.figure.canvas.flush_events()
+        
+        
 
     def Update(self): 
         if len(self.x) >= self.maxpoints + 1:
@@ -777,13 +820,19 @@ class Plot(tk.Frame):
         self.x = x
         self.y = y
         self.z = z
-        self.Update()
         
     def Appendy(self, value):
+        if len(self.y) >= self.maxpoints:
+            self.y.pop(0)
         self.y.append(value)
-        self.Increment("x")
+        if len(self.x) > 0:
+            if max(self.x) >= self.maxpoints:
+                pass
+            else:
+                self.Increment("x")
+        else:
+            self.Increment("x")
 
-        self.Update()
         
 
     def Increment(self, variable):
@@ -849,8 +898,7 @@ class TkTable(tk.LabelFrame):
 
         for index, row in self.dataframe.iterrows():
             self.treeview.insert('', tk.END, values=[index, *list(row.values)])
-    def test(self):
-        print("test")
+
     def _Boundscrollwheel(self, event):
         self.treeview.bind_all("<MouseWheel>", self._Onscrollwheel)
 
@@ -888,158 +936,64 @@ class TkTable(tk.LabelFrame):
         self.dataframe[col][row] = var.get()
         self.Update()
 
-class BaseThread(threading.Thread):
+
+class BaseThread:
     """
     Base class for the producer-consumer threads. 
     """
-    def __init__(self, name, queue, interval=1):
-        """
-        Initialization of the BaseThread class
-
-        Parameters
-        ----------
-        queue: queue.Queue
-        The queue to get and store data 
-
-        interval: int
-        Interval between operations in seconds
-
-        Returns
-        -------
-        None
-        """
-        
+    def __init__(self, name, queue, interval):
         # Init base class
-        threading.Thread.__init__(self)
+        
+        self.thread = None
 
         # Store queue and interval in object
         self.interval = interval
         self.queue = queue
 
         # Create active and alive parameters
-        self.active = False
-        self.alive = True
+        self.alive = False
         self.name = name
 
     def run(self):
-        """
-        Mainloop of the thread
-
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        None
-        """
+       
         # Start loop aslong as the thread is alive
         while self.alive:
-
-            # Check if the thread is actively used
-            if self.active == True:
-
-                # Execute the inner thread
-                self.Thread_inside()
-
-                # Sleep if needed
-                if self.interval != None:
-                    time.sleep(self.interval)
-                
-                # Debug msg
-                if PTOOLKITLOGGER.level == logging.DEBUG:
-                    time.sleep(0.1)
-                    PTOOLKITLOGGER.debug(f"Thread {self.name} is reading from a queue with current size: {self.queue.qsize()}.")
-        
-        # Debug msg   
-        PTOOLKITLOGGER.debug(f"Killing thread: {self.name}")
-
-        return
+            # Execute the inner thread
+            self.Thread_inside()
+            # Sleep if needed
+            if self.interval != None:
+                time.sleep(self.interval)
+            
+            # Debug msg
+            if PTOOLKITLOGGER.level == logging.DEBUG:
+                time.sleep(0.5)
+                PTOOLKITLOGGER.debug(f"Thread {self.name} is using a queue with current size: {self.queue.qsize()}.")
 
     def Thread_inside(self):
-        """
-        Inside of the thread method in BaseThread no use
-
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        None
-        """
-
+       pass
 
     def Start(self):
-        """
-        Method to start or restart the thread
-
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        None
-        """
+        
+        self.thread = threading.Thread(target=self.run, daemon=True)
 
         PTOOLKITLOGGER.debug(f"Starting thread: {self.name}")
         # Set the thread active
-        self.active = True
+        self.alive = True
 
-        # Try to start the thread from the orginal if already active skip
-        try:
-            super(BaseThread, self).start()
-        except:
-            pass
+        self.thread.start()
 
     def Stop(self):
-        """
-        Method to stop the thread
-
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        None
-        """
+        
         PTOOLKITLOGGER.debug(f"Stopping thread: {self.name}")
-        self.active = False
-
-    def Kill(self):
-        """
-        Method to kill the thread
-
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        None
-        """
         self.alive = False
 
     def Toggle(self):
-        """
-        Method to toggle the thread
-
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        None
-        """
-        if self.active == True:
+        
+        if self.alive == True:
             self.Stop()
 
-        elif self.active == False:
+        elif self.alive == False:
             self.Start()
-
 
     
 
@@ -1098,7 +1052,8 @@ class ProducerThread(BaseThread):
         else:
             msg = f"Data overflow in queue, thread {self.name} cannot add more data. Data is currently being lost!!! Increase queue size or increase processing speed."
             if self.terminal != None:
-                self.terminal.Terminal_msg(msg, True)    
+                self.terminal.Terminal_msg(msg, True) 
+   
             
             PTOOLKITLOGGER.warning(msg)
                 
@@ -1106,7 +1061,7 @@ class ConsumerThread(BaseThread):
     """
     A class that allows for data processing from a queue
     """
-    def __init__(self, name, consumerfunction, queue, interval=None, terminal=None):
+    def __init__(self, name, consumerfunction, queue, interval=1, terminal=None):
         """
         Initialization of the ConsumerThread class
 
@@ -1154,3 +1109,6 @@ class ConsumerThread(BaseThread):
             # Get data from the queue and process it
             data = self.queue.get()
             self.consumerfunction(data)
+
+        else:
+            time.sleep(self.interval)
