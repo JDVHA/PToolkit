@@ -6,6 +6,5 @@ fix bug in state system (sometimes produces extra lines)
 rowspan and colspan support for keyboard
 more than one producer thread per queue
 rotation using keyboard
-keyboard 2 buttons
 ignore overflow option producerthread
 stop freezing consumer and producer threads

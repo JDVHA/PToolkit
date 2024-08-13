@@ -5,7 +5,7 @@ import sys
 
 sys.path.append("dependencies/")
 
-from LabControl import MainPToolkitApp, Interface, ParameterField, SerialPortSelector, Terminal, Display, Plot, StatusLED, TkTable, VerticalAllign, KeyBoard, ArrowKeyPad
+from LabControl import Interface, ParameterField, SerialPortSelector, Terminal, Display, Plot, StatusLED, TkTable, VerticalAllign, KeyBoard, ArrowKeyPad
 import tkinter as tk
 import math, serial, random, queue
 from LabControl import ConsumerThread, ProducerThread
@@ -39,7 +39,7 @@ class Arduino(Interface):
 
         self.terminal.grid(row=3, column=0, sticky="n")
 
-        self.plot = Plot(self.frame, diplayfps=True)
+        self.plot = Plot(self.frame, diplayfps=True, ylim=(-5, 5))
         self.plot.set_xlabel("Test")
         self.plot.set_ylabel("Test")
         self.plot.grid(row=0, column=1, rowspan=4, sticky="n")

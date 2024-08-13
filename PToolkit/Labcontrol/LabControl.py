@@ -760,7 +760,6 @@ class Plot(tk.Frame):
         self.ax = self.figure.add_subplot(111)
         self.FPS_DISPLAY = diplayfps
         
-        
         self.line, = self.ax.plot([], lw=3)
         self.ax.set_ylim(*ylim)
         self.ax.set_xlim(0, self.maxpoints)
