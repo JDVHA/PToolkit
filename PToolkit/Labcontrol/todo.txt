@@ -8,3 +8,6 @@ more than one producer thread per queue
 rotation using keyboard
 ignore overflow option producerthread
 stop freezing consumer and producer threads
+bug in Terminal when not entering command
+bug in Terminal not changing the name of the interface in py file
+cursed 7display code fixen

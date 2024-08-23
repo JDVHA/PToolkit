@@ -30,6 +30,7 @@ class MainPToolkitApp(tk.Tk):
         self.interfacenames = []
         self.exitfunc = lambda: print("")
         self.protocol("WM_DELETE_WINDOW", self.StopApp)
+        self.title(self.name)
 
     def mainloop(self):
         self.StartApp()
@@ -1111,3 +1112,201 @@ class ConsumerThread(BaseThread):
 
         else:
             time.sleep(self.interval)
+
+
+class Digit:
+    def __init__(self, canvas, offsetx, offsety, length=30, style="rectangle"):
+        self.canvas = canvas
+        self.segments = []
+        offsets = (
+            (0, 0, 1, 0),  # top
+            (1, 0, 1, 1),  # upper right
+            (1, 1, 1, 2),  # lower right
+            (0, 2, 1, 2),  # bottom
+            (0, 1, 0, 2),  # lower left
+            (0, 0, 0, 1),  # upper left
+            (0, 1, 1, 1),  # middle
+        )
+
+        total = 2*length
+
+        a = length/20
+        b = length-4*a
+        c = 7
+
+        disp = [
+            ("h", 0, 0, c, 0),
+            ("v", 1, 0, 1.1*c, c),
+            ("v", 1, 1, 1.1*c, 2.1*c+a),
+            ("h", 0, 2, c, 2.2*c+2*a),
+            ("v", 0, 1, 0, 2*c+a),
+            ("v", 0, 0, 0, c),
+            ("h", 0, 1, c, 2*c),
+        ]
+
+        self.digits = {
+            "0": (1, 1, 1, 1, 1, 1, 0),  # 0
+            "1": (0, 1, 1, 0, 0, 0, 0),  # 1
+            "2": (1, 1, 0, 1, 1, 0, 1),  # 2
+            "3": (1, 1, 1, 1, 0, 0, 1),  # 3
+            "4": (0, 1, 1, 0, 0, 1, 1),  # 4
+            "5": (1, 0, 1, 1, 0, 1, 1),  # 5
+            "6": (1, 0, 1, 1, 1, 1, 1),  # 6
+            "7": (1, 1, 1, 0, 0, 0, 0),  # 7
+            "8": (1, 1, 1, 1, 1, 1, 1),  # 8
+            "9": (1, 1, 1, 1, 0, 1, 1),  # 9
+            "-": (0, 0, 0, 0, 0, 0, 1),  # -
+            " ": (0, 0, 0, 0, 0, 0, 0),  # Blanck
+        }
+
+        width = 3
+        x = offsetx
+        y = offsety
+
+        baseoffset = 0
+        
+        if style == "rectangle":
+            for x0, y0, x1, y1 in offsets:
+                seg = self.canvas.create_line(
+                        x + x0*length,
+                        y + y0*length,
+                        x + x1*length,
+                        y + y1*length,
+                    width=width, fill="gray")
+            
+                self.segments.append(seg)
+            
+            xc0 = x + length
+            yc0 = y + 2*length-2*width
+            xc1 = xc0 + int(length/5)
+            yc1 = yc0 + int(length/5)
+
+        elif style == "hexagon":
+            for i in disp:
+
+                mode = i[0]
+                offsetx = baseoffset + i[1]*b+2*a + i[3] + x
+                offsety = baseoffset + i[2]*b+2*a + i[4] + y
+
+                points = self.Get_points(a, b, offsetx, offsety, mode=mode)
+                seg = self.canvas.create_polygon(points, fill="gray")
+                self.segments.append(seg)
+
+            xc0 = x + length + c
+            yc0 = y + 2*length
+            xc1 = xc0 + int(length/5)
+            yc1 = yc0 + int(length/5)
+        
+
+        self.dot = self.canvas.create_oval(xc0, yc0, xc1, yc1, fill="black", width=0)
+    
+    def Get_points(self, a, b, offsetx, offsety, mode):
+        points_v = [
+                offsetx+a, 0 + offsety,
+                offsetx+2*a, a + offsety,
+                offsetx+2*a, a+b + offsety,
+                offsetx+a, 2*a+b + offsety,
+                offsetx+0, a+b + offsety,
+                offsetx+0, a + offsety,
+            ]
+        points_h = [
+                offsetx, a+offsety,
+                offsetx+a, 0+offsety,
+                offsetx+b, 0+offsety,
+                offsetx+b+a, a+offsety,
+                offsetx+b, 2*a+offsety,
+                offsetx+a, 2*a+offsety,
+            ]
+        if mode == "h":
+            return points_h
+        
+        elif mode == "v":
+            return points_v
+        
+    def Update(self, char):
+
+        binarysegments = self.digits[char]
+
+        for iid, on in zip(self.segments, binarysegments):
+
+            if on == True:
+                color = "red"
+
+            else:
+                color = "gray"
+
+            self.canvas.itemconfigure(iid, fill=color)
+    
+    def Setdot(self, state):
+        if state == True:
+            color = "red"
+
+        else:
+            color = "black"
+        self.canvas.itemconfigure(self.dot, fill=color)
+
+
+class SevenSegmentDisplay(tk.Frame):
+    def __init__(self, root, digits, negative_numbers=True, style="hexagon"):
+        tk.Frame.__init__(self, root.frame)
+        font=5
+        self.length = 10*font
+        self.width = font
+
+        self.lastdot = 0
+        
+        self.digits = []
+        self.negative_numbers = negative_numbers
+        
+        if negative_numbers == True:
+            digits += 1
+
+        spacing = 20
+        f = 20
+
+        # Bug
+        if style == "hexagon":
+            f += 10
+        
+        # After digits mod, prevents bug
+        self.canvas = tk.Canvas(self, width=10+(self.length+spacing)*digits, height=2*self.length+f, bg="black")
+        self.canvas.pack()
+
+        for i in range(digits):
+            self.digits.append(Digit(self.canvas, 10+(self.length+spacing)*i, 10, self.length, style=style))
+        
+        for i in self.digits:
+            i.Update(" ")
+
+        
+
+    def UpdateDisplay(self, num):
+        string = str(num)
+
+        if num > 0 and self.negative_numbers == True:
+            string = " " + string
+
+        self.digits[self.lastdot].Setdot(False)
+
+        if "." in string:   
+            
+            pos = string.index(".")
+
+            self.lastdot = pos-1
+
+            string = string.replace(".", "")
+            self.digits[self.lastdot].Setdot(True)
+
+        for i in range(len(self.digits)):
+
+            if i < len(string):
+                self.digits[i].Update(string[i])
+            
+            else:
+                self.digits[i].Update(" ")
+
+        
+                
+            
+
+
