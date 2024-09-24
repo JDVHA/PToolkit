@@ -22,14 +22,18 @@ sys.path.append(BASEDIR + "\\interfaces")
 # ------------------------------------------------------------------------------------------------
 from Arduino import Arduino
 from TTi_1604 import TTi_1604
+from blankinterface import blankinterface
         
 root = MainPToolkitApp(APPNAME)
 
-#A = Arduino(root, "Arduino1")
-#A.grid(row=0, column=0)
+A = Arduino(root, "Arduino1")
+A.grid(row=0, column=0)
 
-B = TTi_1604(root, "TTi_1604")
-B.grid(row=0, column=0)
+#B = TTi_1604(root, "TTi_1604")
+#B.grid(row=0, column=0)
+
+#blankinterface(root, "blank").pack()
+
 
 if __name__ == "__main__":
     root.mainloop()

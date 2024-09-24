@@ -1,10 +1,10 @@
 from setuptools import setup
-
+version = "2.0.0"
 
 setup(
     name="PToolkit",
-    version="1.0.3",
-    description="A set of tools than is usefull in lots of diffrent fields. This toolkit contains functions to make professional looking matplotlib plot without spending time on the looks of the plot. Not only that this toolkit also provides functions for rounding and determining errors.",
+    version=version,
+    description="A set of tools to make working in a lab easier.",
     url="https://github.com/JDVHA/PToolkit",
     author="H.A.J de Vries",
     author_email="",
@@ -14,7 +14,13 @@ setup(
           'numpy',
           "matplotlib",
           "sympy",
-          "scipy"
+          "scipy",
+          "pyserial"
       ],
+    entry_points = {
+        'console_scripts': [
+            'PToolkit = PToolkit.cmd:main'
+        ]
+    },
 )
 

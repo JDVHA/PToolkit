@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tools &mdash; Ptoolkit 2.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=60dbed4a"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="LabControl" href="LabControl.html" />
+    <link rel="prev" title="Welcome to Ptoolkit’s documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ptoolkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tools</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#general-purpose-functions">General purpose functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Dataframe_to_latex"><code class="docutils literal notranslate"><span class="pre">Dataframe_to_latex()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Find_nearest"><code class="docutils literal notranslate"><span class="pre">Find_nearest()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Remove_ramp"><code class="docutils literal notranslate"><span class="pre">Remove_ramp()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Smooth"><code class="docutils literal notranslate"><span class="pre">Smooth()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#error-analysis-and-statistics">Error analysis and statistics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Error_function"><code class="docutils literal notranslate"><span class="pre">Error_function()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Round_sigfig"><code class="docutils literal notranslate"><span class="pre">Round_sigfig()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Chi_square_test"><code class="docutils literal notranslate"><span class="pre">Chi_square_test()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Chi_square_dist"><code class="docutils literal notranslate"><span class="pre">Chi_square_dist()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Calculate_degrees_of_freedom"><code class="docutils literal notranslate"><span class="pre">Calculate_degrees_of_freedom()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Calculate_p_value"><code class="docutils literal notranslate"><span class="pre">Calculate_p_value()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="LabControl.html">LabControl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Deprecated.html">Deprecated</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ptoolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Tools</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/Tools.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="tools">
+<h1>Tools<a class="headerlink" href="#tools" title="Link to this heading"></a></h1>
+<section id="general-purpose-functions">
+<h2>General purpose functions<a class="headerlink" href="#general-purpose-functions" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="Dataframe_to_latex">
+<span class="sig-name descname"><span class="pre">Dataframe_to_latex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">','</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Dataframe_to_latex" title="Link to this definition"></a></dt>
+<dd><p>A function to convert a pandas dataframe to a latex table. When running
+this function the output will be printed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>seperator</strong> – The dataframe that needs to be converted</p></li>
+<li><p><strong>seperator</strong> – The seperator the type used can be “.” or “,”.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Find_nearest">
+<span class="sig-name descname"><span class="pre">Find_nearest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Find_nearest" title="Link to this definition"></a></dt>
+<dd><p>A function to convert a pandas dataframe to a latex table. When running
+this function the output will be printed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>array</strong> – The array in which to search for a given value</p></li>
+<li><p><strong>value</strong> – The value to search for</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple containing the value closest to the value and the index on where to find it.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Remove_ramp">
+<span class="sig-name descname"><span class="pre">Remove_ramp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gues</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Remove_ramp" title="Link to this definition"></a></dt>
+<dd><p>Function to remove a ramp from a signal. Signal must be a numpy array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>signal</strong> (<em>float</em>) – The signal that needs a ramp removed</p></li>
+<li><p><strong>gues</strong> (<em>float</em>) – geus for the ramp in the signal</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Signal without a ramp</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Smooth">
+<span class="sig-name descname"><span class="pre">Smooth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gues</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Smooth" title="Link to this definition"></a></dt>
+<dd><p>Function to smooth out a signal. Signal must be numpy array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>signal</strong> (<em>float</em>) – Signal to be smoothed</p></li>
+<li><p><strong>box_pts</strong> (<em>float</em>) – Smoothess of the curve</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Smoothed signal</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="error-analysis-and-statistics">
+<h2>Error analysis and statistics<a class="headerlink" href="#error-analysis-and-statistics" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="Error_function">
+<span class="sig-name descname"><span class="pre">Error_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variables</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Error_function" title="Link to this definition"></a></dt>
+<dd><p>Function to determine the error of a function based on the errros of the variables of that function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>function</strong> – A sympy expression of which the error function should be determined</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A sympy expression of the error function</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>sympy.core.add.Add</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">PToolkit</span> <span class="kn">import</span> <span class="n">Error_function</span>
+<span class="kn">import</span> <span class="nn">sympy</span> <span class="k">as</span> <span class="nn">sy</span>
+
+<span class="n">I</span><span class="p">,</span> <span class="n">R</span> <span class="o">=</span> <span class="n">sy</span><span class="o">.</span><span class="n">symbols</span><span class="p">(</span><span class="s2">&quot;I, R&quot;</span><span class="p">)</span>
+<span class="n">V</span> <span class="o">=</span> <span class="n">I</span><span class="o">*</span><span class="n">R</span>
+
+<span class="n">error</span> <span class="o">=</span> <span class="n">Error_function</span><span class="p">(</span><span class="n">V</span><span class="p">,</span> <span class="p">[</span><span class="n">I</span><span class="p">,</span> <span class="n">R</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>The outpur of the code:</p>
+<div class="math notranslate nohighlight">
+\[\Delta V = \sqrt{\left|{I}\right|^{2} \left|{\Delta R}\right|^{2} + \left|{R}\right|^{2} \left|{\Delta I}\right|^{2}}\]</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="Round_sigfig">
+<span class="sig-name descname"><span class="pre">Round_sigfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_rounding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Normal'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'numerical'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Round_sigfig" title="Link to this definition"></a></dt>
+<dd><p>Function to determine the error of a function based on the errros of the variables of that function.
+This function also works with numpy arrays</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – A float that needs to be rounded</p></li>
+<li><p><strong>fig</strong> – The number of significant digits</p></li>
+<li><p><strong>type</strong> – The type of rounding: “Normal” rounds to the closest number, “Up” rounds up, “Down” rounds down</p></li>
+<li><p><strong>format</strong> – Unused param</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A number rounded to a n significant digits</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Chi_square_test">
+<span class="sig-name descname"><span class="pre">Chi_square_test</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theorie</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Chi_square_test" title="Link to this definition"></a></dt>
+<dd><p>Function to perform a Chi^2 test</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>theorie</strong> (<em>float</em>) – Theoretical value of a data point</p></li>
+<li><p><strong>mean</strong> (<em>float</em>) – The mean of that data point</p></li>
+<li><p><strong>error</strong> (<em>float</em>) – The error of that data point</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Chi_square_dist">
+<span class="sig-name descname"><span class="pre">Chi_square_dist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Chi_square_dist" title="Link to this definition"></a></dt>
+<dd><blockquote>
+<div><p>Function to calculate the values on a Chi^2 distribution</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>float</em>) – The Chi^2 value</p></li>
+<li><p><strong>d</strong> (<em>int</em>) – Degrees of freedom</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The value at a given point in the Chi^2 distribution</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Calculate_degrees_of_freedom">
+<span class="sig-name descname"><span class="pre">Calculate_degrees_of_freedom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Calculate_degrees_of_freedom" title="Link to this definition"></a></dt>
+<dd><p>Function to calculte the number of degrees of freedom</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<em>int</em>) – Amount of independent data points</p></li>
+<li><p><strong>v</strong> (<em>int</em>) – Amount of parameters</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Degrees of freedom</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Calculate_p_value">
+<span class="sig-name descname"><span class="pre">Calculate_p_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Calculate_p_value" title="Link to this definition"></a></dt>
+<dd><p>Function to calculate the p value of a Chi^2 distribution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chi</strong> (<em>float</em>) – The value found for chi^2</p></li>
+<li><p><strong>d</strong> (<em>int</em>) – Degrees of freedom</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>p value</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to Ptoolkit’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="LabControl.html" class="btn btn-neutral float-right" title="LabControl" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, JDVHA.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

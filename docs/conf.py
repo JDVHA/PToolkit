@@ -7,9 +7,9 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'Ptoolkit'
-copyright = '2022, JDVHA'
+copyright = '2024, JDVHA'
 author = 'JDVHA'
-release = '1.0'
+release = '2.0'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

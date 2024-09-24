@@ -1,0 +1,1364 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LabControl &mdash; Ptoolkit 2.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=60dbed4a"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Deprecated" href="Deprecated.html" />
+    <link rel="prev" title="Tools" href="Tools.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ptoolkit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Tools.html">Tools</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">LabControl</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#getting-started">Getting started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#example">Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#core-classes">Core classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#MainPToolkitApp"><code class="docutils literal notranslate"><span class="pre">MainPToolkitApp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#MainPToolkitApp.__init__"><code class="docutils literal notranslate"><span class="pre">MainPToolkitApp.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#MainPToolkitApp.mainloop"><code class="docutils literal notranslate"><span class="pre">MainPToolkitApp.mainloop()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#MainPToolkitApp.set_exit_func"><code class="docutils literal notranslate"><span class="pre">MainPToolkitApp.set_exit_func()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#Interface"><code class="docutils literal notranslate"><span class="pre">Interface</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Interface.__init__"><code class="docutils literal notranslate"><span class="pre">Interface.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#Parameter"><code class="docutils literal notranslate"><span class="pre">Parameter</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#widgets">Widgets</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#controls">Controls</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Button"><code class="docutils literal notranslate"><span class="pre">Button</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#KeyBoard"><code class="docutils literal notranslate"><span class="pre">KeyBoard</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ArrowKeyPad"><code class="docutils literal notranslate"><span class="pre">ArrowKeyPad</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#StatusLED"><code class="docutils literal notranslate"><span class="pre">StatusLED</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#hardware-interfacing">Hardware interfacing</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#SerialPortSelector"><code class="docutils literal notranslate"><span class="pre">SerialPortSelector</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#terminal">Terminal</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Terminal"><code class="docutils literal notranslate"><span class="pre">Terminal</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#data-displays-and-manipulation">Data displays and manipulation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Plot"><code class="docutils literal notranslate"><span class="pre">Plot</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#SevenSegmentDisplay"><code class="docutils literal notranslate"><span class="pre">SevenSegmentDisplay</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Display"><code class="docutils literal notranslate"><span class="pre">Display</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ParameterField"><code class="docutils literal notranslate"><span class="pre">ParameterField</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#alignment">Alignment</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#VerticalAllign"><code class="docutils literal notranslate"><span class="pre">VerticalAllign</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#scripting">Scripting</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ScriptLoader"><code class="docutils literal notranslate"><span class="pre">ScriptLoader</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Deprecated.html">Deprecated</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ptoolkit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">LabControl</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/LabControl.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="labcontrol">
+<h1>LabControl<a class="headerlink" href="#labcontrol" title="Link to this heading"></a></h1>
+<section id="getting-started">
+<h2>Getting started<a class="headerlink" href="#getting-started" title="Link to this heading"></a></h2>
+<p>PToolkit LabControl provides an environment for creating gui applications for lab setups.
+It does this by introducing a standard framework and a set of widgets. To get stared create a project using the follow command where &lt;projectname&gt; is the name of your application</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PToolkit</span> <span class="n">newproject</span> <span class="o">&lt;</span><span class="n">projectname</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>This creates the following file structure:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>project
+├── interfaces
+│   └── blankinterface.py
+├── log
+├── scripts
+├── profiles
+├── .state
+└── Main.py
+</pre></div>
+</div>
+<p>The Interfaces folder contains all the application’s interfaces. An interface is a piece of code containing one or more widgets that can be duplicated or easily shared with others.
+The log folder contains the application logs, the scripts folder contains Python scripts that can be called using a script loader, the profiles folder is currently unused.
+The .state file stores parameter values, these values are reloaded when the application is restarted. The Main.py file is the main application file where all interfaces are added to the application.</p>
+<p>The main application file looks like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Configure some important things</span>
+<span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">logging</span>
+<span class="n">BASEDIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+
+<span class="kn">from</span> <span class="nn">PToolkit.LabControl</span> <span class="kn">import</span> <span class="n">MainPToolkitApp</span><span class="p">,</span> <span class="n">PTOOLKITLOGGER</span>
+
+<span class="c1"># Configuring the logger</span>
+<span class="n">PTOOLKITLOGGER</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+
+<span class="c1"># Loading the interfaces folder</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">BASEDIR</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">interfaces&quot;</span><span class="p">)</span>
+
+<span class="c1"># Your application</span>
+<span class="c1"># ------------------------------------------------------------------------------------------------</span>
+<span class="kn">from</span> <span class="nn">blankinterface</span> <span class="kn">import</span> <span class="n">blankinterface</span>
+
+<span class="n">root</span> <span class="o">=</span> <span class="n">MainPToolkitApp</span><span class="p">()</span>
+
+<span class="n">blankinterface</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;BlankInterface&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">root</span><span class="o">.</span><span class="n">mainloop</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The MainPToolkitApp functions as TK from tkinter with the only difference being some background stuff such as handeling the .state file.
+Every interface that is created behaves as a tkinter labelframe, and must be placed under the definition of root, both pack and grid are supported for interfaces.
+The PTOOLKITLOGGER is automaticly imported and configured, only when debugging change the level to DEBUG (this will slow down the application). The blankinterface.py looks like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">PToolkit.LabControl</span> <span class="kn">import</span> <span class="n">Interface</span>
+<span class="kn">import</span> <span class="nn">tkinter</span> <span class="k">as</span> <span class="nn">tk</span>
+<span class="kn">from</span> <span class="nn">tkinter</span> <span class="kn">import</span> <span class="n">ttk</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;dependencies/&quot;</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">blankinterface</span><span class="p">(</span><span class="n">Interface</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">Interface</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frame</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Welcome to PToolkit&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__GUI__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Every interface created must inherit from interface, make sure this is the first inheritance. By convention all widgets are created in the __init__ method,
+and all the placement of the widgets is done in the __GUI__ method. This method is automaticly called when it is added to the MainPToolkitApp.
+Creating a new interface can be done by hand or by terminal using the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PToolkit</span> <span class="n">newinterface</span> <span class="o">&lt;</span><span class="n">interfacename</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</section>
+<section id="example">
+<h2>Example<a class="headerlink" href="#example" title="Link to this heading"></a></h2>
+<p>In this example we will create a very simple Arduino interface. We create our project using the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PToolkit</span> <span class="n">newproject</span> <span class="n">myfirstapp</span>
+</pre></div>
+</div>
+<p>And create a new interface using (make sure to be in the interface dir):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PToolkit</span> <span class="n">newinterface</span> <span class="n">Arduino</span>
+</pre></div>
+</div>
+<p>In our Arduino.py file we will first add a VerticalAllign object to allign our widgets and a terminal:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Arduino</span><span class="p">(</span><span class="n">Interface</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">Interface</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">valign</span> <span class="o">=</span> <span class="n">VerticalAllign</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">terminal</span> <span class="o">=</span> <span class="n">Terminal</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">terminal</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__GUI__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">valign</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sticky</span><span class="o">=</span><span class="s2">&quot;N&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Next we will import serial and add a serial object and portselector (make sure to put self.valign as the root parameter):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">serial</span> <span class="o">=</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span><span class="n">baudrate</span><span class="o">=</span><span class="mi">9600</span><span class="p">)</span>
+
+<span class="bp">self</span><span class="o">.</span><span class="n">portselector</span> <span class="o">=</span> <span class="n">SerialPortSelector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">valign</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">serial</span><span class="p">,</span> <span class="n">terminal</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">terminal</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We write two quick methods to talk to our Arduino:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">ReadArduino</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">serial</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+<span class="k">def</span> <span class="nf">SendVar</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">var</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">serial</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Next we will add a parameterfield and button to our application (make sure it is the PToolkit button, otherwise it won’t work with VerticalAllign):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">var</span> <span class="o">=</span> <span class="n">ParameterField</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">valign</span><span class="p">,</span> <span class="s2">&quot;Value to send&quot;</span><span class="p">)</span>
+
+<span class="bp">self</span><span class="o">.</span><span class="n">button</span> <span class="o">=</span> <span class="n">Button</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">valign</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Send&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The last thing to do is a bit more complicated. We will add a producer and consumer thread, these will handle the data stream for us.
+These threads will communicate with eachother via a queue (import queue) we create one with size 10.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">prod</span> <span class="o">=</span> <span class="n">ProducerThread</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;ArduinoRead&quot;</span><span class="p">,</span>
+        <span class="n">generationfunction</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ReadArduino</span><span class="p">,</span>
+        <span class="n">queue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">arduino_queue</span><span class="p">,</span>
+        <span class="n">interval</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">terminal</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">terminal</span>
+    <span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">cons</span> <span class="o">=</span> <span class="n">ConsumerThread</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;TerminalPrinter&quot;</span><span class="p">,</span>
+        <span class="n">consumerfunction</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">terminal</span><span class="o">.</span><span class="n">terminal_msg</span><span class="p">,</span>
+        <span class="n">queue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">arduino_queue</span><span class="p">,</span>
+        <span class="n">interval</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">terminal</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">terminal</span>
+        <span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">prod</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">cons</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The producer thread will execute the self.Arduino method every 0.1 seconds and put the data into the queue. The consumer thread takes one piece of data out of the queue every 0.1 seconds.
+All of this happens on the background, therefore the impact on our application is minimal. Both threads are started using the start method. Note that for a very simple Arduino program these
+threads are not required, one can simple run readline after write and as long as the Arduino respons in a reasonable time. Combining all these things together. Our Main.py file looks like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Configure some important things</span>
+<span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">logging</span>
+<span class="n">BASEDIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+
+<span class="kn">from</span> <span class="nn">PToolkit.LabControl</span> <span class="kn">import</span> <span class="n">MainPToolkitApp</span><span class="p">,</span> <span class="n">PTOOLKITLOGGER</span>
+
+<span class="c1"># Configuring the logger</span>
+<span class="n">PTOOLKITLOGGER</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+
+<span class="c1"># Loading the interfaces folder</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">BASEDIR</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">interfaces&quot;</span><span class="p">)</span>
+
+<span class="c1"># Your application</span>
+<span class="c1"># ------------------------------------------------------------------------------------------------</span>
+<span class="kn">from</span> <span class="nn">Arduino</span> <span class="kn">import</span> <span class="n">Arduino</span>
+
+<span class="n">root</span> <span class="o">=</span> <span class="n">MainPToolkitApp</span><span class="p">()</span>
+
+<span class="n">Arduino</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;Arduino&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">root</span><span class="o">.</span><span class="n">mainloop</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>And our Arduino.py file looks like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;dependencies/&quot;</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">PToolkit.LabControl</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">tkinter</span> <span class="k">as</span> <span class="nn">tk</span>
+<span class="kn">import</span> <span class="nn">serial</span><span class="o">,</span> <span class="nn">queue</span>
+
+
+<span class="k">class</span> <span class="nc">Arduino</span><span class="p">(</span><span class="n">Interface</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">Interface</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">valign</span> <span class="o">=</span> <span class="n">VerticalAllign</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">terminal</span> <span class="o">=</span> <span class="n">Terminal</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">serial</span> <span class="o">=</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span><span class="n">baudrate</span><span class="o">=</span><span class="mi">9600</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">portselector</span> <span class="o">=</span> <span class="n">SerialPortSelector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">valign</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">serial</span><span class="p">,</span> <span class="n">terminal</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">terminal</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">var</span> <span class="o">=</span> <span class="n">ParameterField</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">valign</span><span class="p">,</span> <span class="s2">&quot;Value to send&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">button</span> <span class="o">=</span> <span class="n">Button</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">valign</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Send&quot;</span><span class="p">,</span> <span class="n">command</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">SendVar</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">arduino_queue</span> <span class="o">=</span> <span class="n">queue</span><span class="o">.</span><span class="n">Queue</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">prod</span> <span class="o">=</span> <span class="n">ProducerThread</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;ArduinoRead&quot;</span><span class="p">,</span>
+            <span class="n">generationfunction</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ReadArduino</span><span class="p">,</span>
+            <span class="n">queue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">arduino_queue</span><span class="p">,</span>
+            <span class="n">interval</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+            <span class="n">terminal</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">terminal</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cons</span> <span class="o">=</span> <span class="n">ConsumerThread</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;TerminalPrinter&quot;</span><span class="p">,</span>
+            <span class="n">consumerfunction</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">terminal</span><span class="o">.</span><span class="n">terminal_msg</span><span class="p">,</span>
+            <span class="n">queue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">arduino_queue</span><span class="p">,</span>
+            <span class="n">interval</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+            <span class="n">terminal</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">terminal</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">prod</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cons</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__GUI__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">valign</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sticky</span><span class="o">=</span><span class="s2">&quot;N&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">terminal</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">ReadArduino</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">serial</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">SendVar</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">var</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">serial</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The following code on the Arduino</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">setup</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">Serial</span><span class="p">.</span><span class="n">begin</span><span class="p">(</span><span class="mi">9600</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">loop</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">Serial</span><span class="p">.</span><span class="n">available</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+<span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">mystr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Serial</span><span class="p">.</span><span class="n">readString</span><span class="p">();</span>
+<span class="w">    </span><span class="n">mystr</span><span class="p">.</span><span class="n">trim</span><span class="p">();</span>
+<span class="w">    </span><span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="s">&quot;Arduino reads: &quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="n">Serial</span><span class="p">.</span><span class="n">println</span><span class="p">(</span><span class="n">mystr</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>When running this application pressing the send button will send the data from the parameterfield to the Arduino and the Arduino will respond with
+“Arduino reads” + the parameterfield value.</p>
+</section>
+<section id="core-classes">
+<h2>Core classes<a class="headerlink" href="#core-classes" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="MainPToolkitApp">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MainPToolkitApp</span></span><a class="headerlink" href="#MainPToolkitApp" title="Link to this definition"></a></dt>
+<dd><p>The main application of for the LabControl part of PToolkit</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>MainPToolkitApp functions the same as tk.TK, only difference is that it handles interafaces in the background.</p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="MainPToolkitApp.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">appname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MainPToolkitApp.__init__" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>appname</strong> (<em>str</em>) – The name of the application.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MainPToolkitApp.mainloop">
+<span class="sig-name descname"><span class="pre">mainloop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#MainPToolkitApp.mainloop" title="Link to this definition"></a></dt>
+<dd><p>Method to start the mainloop</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="MainPToolkitApp.set_exit_func">
+<span class="sig-name descname"><span class="pre">set_exit_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#MainPToolkitApp.set_exit_func" title="Link to this definition"></a></dt>
+<dd><p>Method that allows the user to execute a function before the application closses.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>func</strong> (<em>func</em>) – Function to be executed</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="Interface">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Interface</span></span><a class="headerlink" href="#Interface" title="Link to this definition"></a></dt>
+<dd><p>The interface class providing a common backend to PToolkit widgets.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="Interface.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">master</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Interface.__init__" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>master</strong> – PToolkit main application</p>
+</dd>
+<dt class="field-even">Pram str name<span class="colon">:</span></dt>
+<dd class="field-even"><p>The name of the interface. Must be unique in each application</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="Parameter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Parameter</span></span><a class="headerlink" href="#Parameter" title="Link to this definition"></a></dt>
+<dd><p>Some of the PToolkit widgets inherit from the Parameter subclass. This means that these widgets acts like a number when performing arithmetic’s.
+For example the display class</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">display</span> <span class="o">=</span> <span class="n">Display</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;Test&quot;</span><span class="p">)</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+
+<span class="n">new_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span> <span class="o">+</span> <span class="mi">1</span>
+<span class="n">new_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span> <span class="o">*</span> <span class="mi">100</span>
+<span class="n">new_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display</span> <span class="o">/</span> <span class="mi">100</span>
+</pre></div>
+</div>
+<p>Some of the parameters (currently only the parameterfield) will save them self when the application is closed, and reload them selfs when restatring.
+Thus setting a parameterfield to 102.1, closing the application and restarting will mean that the 102.1 is still there. These values are stored in the .state file of the application.</p>
+</dd></dl>
+
+</section>
+<section id="widgets">
+<h2>Widgets<a class="headerlink" href="#widgets" title="Link to this heading"></a></h2>
+<section id="controls">
+<h3>Controls<a class="headerlink" href="#controls" title="Link to this heading"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="Button">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Button</span></span><a class="headerlink" href="#Button" title="Link to this definition"></a></dt>
+<dd><p>A button class currently only used for a compatibility issues with VerticalAllign.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="Button.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">command</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Button.__init__" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>root</strong> – Parent window</p></li>
+<li><p><strong>text</strong> (<em>str</em>) – Text on the button</p></li>
+<li><p><strong>command</strong> (<em>function</em>) – function to execute when pressed.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="KeyBoard">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">KeyBoard</span></span><a class="headerlink" href="#KeyBoard" title="Link to this definition"></a></dt>
+<dd><p>Class that creates a widget having a variable amount of buttons that can be mapped.
+Great for controlling movement based robots.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="KeyBoard.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">textgrid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commandgrid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imagegrid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#KeyBoard.__init__" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>root</strong> – Parent window</p></li>
+<li><p><strong>grid</strong> (<em>list</em>) – List with 0 or 1 to indicate where a button must be placed</p></li>
+<li><p><strong>textgrid</strong> (<em>list</em>) – A list with text for each index</p></li>
+<li><p><strong>commandgrid</strong> (<em>list</em>) – A list with functions for each index</p></li>
+<li><p><strong>imagegrid</strong> (<em>list</em>) – A list with image paths for each index</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<p>Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">PToolkit.LabControl</span> <span class="kn">import</span> <span class="n">KeyBoard</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="k">class</span> <span class="nc">blankinterface</span><span class="p">(</span><span class="n">Interface</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">Interface</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+        <span class="c1"># TTi 1604 buttons</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">keyboard</span> <span class="o">=</span> <span class="n">KeyBoard</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)),</span>
+                                <span class="p">[</span>
+                                    <span class="p">[</span><span class="s2">&quot;mV&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\u2126</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\u2191</span><span class="s2">&quot;</span><span class="p">],</span>
+                                    <span class="p">[</span><span class="s2">&quot;mA&quot;</span><span class="p">,</span> <span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;Hz&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\u2193</span><span class="s2">&quot;</span><span class="p">],</span>
+                                    <span class="p">[</span><span class="s2">&quot;DC&quot;</span><span class="p">,</span> <span class="s2">&quot;AC&quot;</span><span class="p">,</span> <span class="s2">&quot;SHIFT&quot;</span><span class="p">,</span> <span class="s2">&quot;Auto&quot;</span><span class="p">]</span>
+                                <span class="p">],</span>
+                                <span class="n">commandgrid</span><span class="o">=</span> <span class="p">[</span>
+                                    <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">myfunc1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">myfunc2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">myfunc1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">myfunc2</span><span class="p">],</span>
+                                    <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">myfunc1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">myfunc2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">myfunc1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">myfunc2</span><span class="p">],</span>
+                                    <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">myfunc1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">myfunc2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">myfunc1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">myfunc2</span><span class="p">],</span>
+                                    <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">myfunc1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">myfunc2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">myfunc1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">myfunc2</span><span class="p">]</span>
+                                <span class="p">]</span>
+                                <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__GUI__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">keyboard</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">myfunc1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">myfunc2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;2&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="ArrowKeyPad">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ArrowKeyPad</span></span><a class="headerlink" href="#ArrowKeyPad" title="Link to this definition"></a></dt>
+<dd><p>Class that creates a widget having a variable amount of buttons that can be mapped.
+Great for controlling movement based setups, such as: microscopes, robots or 3D printers.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ArrowKeyPad.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commandgrid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(4,</span> <span class="pre">4)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">includehome</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">design</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'*'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ArrowKeyPad.__init__" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>root</strong> – Parent window</p></li>
+<li><p><strong>commandgrid</strong> (<em>list</em>) – A 3x3 list with a function or None in each of its entrys. Each of the entrys corrosponds with the button at that position.</p></li>
+<li><p><strong>size</strong> (<em>tuple</em>) – Tuple of the size of the buttons.</p></li>
+<li><p><strong>includehome</strong> (<em>bool</em>) – If a home button must be included.</p></li>
+<li><p><strong>design</strong> (<em>str</em>) – The design used for the widget, options:
+<code class="xref py py-const docutils literal notranslate"><span class="pre">*</span></code>, <code class="xref py py-const docutils literal notranslate"><span class="pre">+</span></code>, <code class="xref py py-const docutils literal notranslate"><span class="pre">&lt;&gt;</span></code> <code class="xref py py-const docutils literal notranslate"><span class="pre">v^</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">blankinterface</span><span class="p">(</span><span class="n">Interface</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">Interface</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mykeypad</span> <span class="o">=</span> <span class="n">ArrowKeyPad</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                    <span class="n">includehome</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">design</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span>
+                    <span class="n">commandgrid</span><span class="o">=</span> <span class="p">[</span>
+                        <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">myfunc</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
+                        <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">myfunc</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">myfunc</span><span class="p">],</span>
+                        <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">myfunc</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+                    <span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">__GUI__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mykeypad</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">myfunc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/Configs.PNG"><img alt="_images/Configs.PNG" src="_images/Configs.PNG" style="width: 1000px;" /></a>
+<dl class="py class">
+<dt class="sig sig-object py" id="StatusLED">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">StatusLED</span></span><a class="headerlink" href="#StatusLED" title="Link to this definition"></a></dt>
+<dd><p>Method that adds a status led, that can be toggled to show a status. Green for a True state and red for a Fase state.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="StatusLED.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#StatusLED.__init__" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>root</strong> – Parent window</p></li>
+<li><p><strong>text</strong> (<em>str</em>) – The text that must be inserted into the label</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="StatusLED.toggle_state">
+<span class="sig-name descname"><span class="pre">toggle_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#StatusLED.toggle_state" title="Link to this definition"></a></dt>
+<dd><p>Method that will invert the state it is currently in.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="StatusLED.set_state">
+<span class="sig-name descname"><span class="pre">set_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#StatusLED.set_state" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>state</strong> (<em>bool</em>) – if True the LED will change to a green, if False it changes to red.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="StatusLED.get_state">
+<span class="sig-name descname"><span class="pre">get_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#StatusLED.get_state" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The current state of the LED</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">PToolkit.LabControl</span> <span class="kn">import</span> <span class="n">StatusLED</span>
+
+<span class="k">class</span> <span class="nc">blankinterface</span><span class="p">(</span><span class="n">Interface</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">Interface</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">led</span> <span class="o">=</span> <span class="n">StatusLED</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;Status&quot;</span><span class="p">)</span>
+
+        <span class="c1"># self.frame must be used instead of self for default tkinter objects.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">button</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frame</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;toggle&quot;</span><span class="p">,</span> <span class="n">command</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">led</span><span class="o">.</span><span class="n">toggle_state</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__GUI__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">led</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">button</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="hardware-interfacing">
+<h3>Hardware interfacing<a class="headerlink" href="#hardware-interfacing" title="Link to this heading"></a></h3>
+<p>SerialPortSelector is a widget that makes it easy to connect to a serial devices while the main application is running. This can for exampl be used to select a specific Arduino during operation.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="SerialPortSelector">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SerialPortSelector</span></span><a class="headerlink" href="#SerialPortSelector" title="Link to this definition"></a></dt>
+<dd><p>Class that creates a widget that can be used to scan and select serial devices.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="SerialPortSelector.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">serial</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Serial</span> <span class="pre">devices:</span> <span class="pre">'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">terminal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SerialPortSelector.__init__" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>root</strong> – Parent window</p></li>
+<li><p><strong>serial</strong> (<em>serial.Serial</em>) – Serial object from the pyserial library</p></li>
+<li><p><strong>text</strong> (<em>str</em>) – Text that is displayed on the label.</p></li>
+<li><p><strong>terminal</strong> (<em>PToolkit.Terminal</em>) – PToolkit terminal object</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SerialPortSelector.set_port">
+<span class="sig-name descname"><span class="pre">set_port</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">port</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SerialPortSelector.set_port" title="Link to this definition"></a></dt>
+<dd><p>Method to set the current port on the serial object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>port</strong> (<em>str</em>) – The serial port to connect to.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SerialPortSelector.get_serial_devices">
+<span class="sig-name descname"><span class="pre">get_serial_devices</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#SerialPortSelector.get_serial_devices" title="Link to this definition"></a></dt>
+<dd><p>Method scans for available serial ports</p>
+</dd></dl>
+
+</dd></dl>
+
+<p>SerialPortSelector adds the following command to the terminal:</p>
+<ul class="simple">
+<li><p>reloadserial: Scans the available serial devices again</p></li>
+</ul>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">PToolkit.LabControl</span> <span class="kn">import</span> <span class="n">SerialPortSelector</span>
+<span class="kn">import</span> <span class="nn">serial</span>
+
+<span class="k">class</span> <span class="nc">blankinterface</span><span class="p">(</span><span class="n">Interface</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">Interface</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">serial</span> <span class="o">=</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">portselect</span> <span class="o">=</span> <span class="n">SerialPortSelector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">serial</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__GUI__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">portselect</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="terminal">
+<h3>Terminal<a class="headerlink" href="#terminal" title="Link to this heading"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="Terminal">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Terminal</span></span><a class="headerlink" href="#Terminal" title="Link to this definition"></a></dt>
+<dd><p>Class that creates a terminal widget, that can be used to communicate with the user during operation. It can also be used to execute commands.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="Terminal.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allowcommands</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Terminal.__init__" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>root</strong> – Parent window</p></li>
+<li><p><strong>text</strong> (<em>str</em>) – Text to be displayed on the labelframe</p></li>
+<li><p><strong>allowcommands</strong> (<em>bool</em>) – If typing commands in the terminal should be allowed</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Terminal.terminal_msg">
+<span class="sig-name descname"><span class="pre">terminal_msg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Terminal.terminal_msg" title="Link to this definition"></a></dt>
+<dd><p>A method that prints a message or error in the terminal.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>msg</strong> (<em>str</em>) – The message the user wants to print in ther terminal.</p></li>
+<li><p><strong>error</strong> (<em>bool</em>) – If the msg must be printed as an error message. If True the message will be printed in red.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Terminal.list_commands">
+<span class="sig-name descname"><span class="pre">list_commands</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Terminal.list_commands" title="Link to this definition"></a></dt>
+<dd><p>A method that prints the available commands in the terminal and adds there doc string as a description.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Terminal.run_command">
+<span class="sig-name descname"><span class="pre">run_command</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Terminal.run_command" title="Link to this definition"></a></dt>
+<dd><p>Method that runs a command in the terminal.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>command</strong> (<em>str</em>) – The command that the user wants to run in the terminal.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Terminal.add_command">
+<span class="sig-name descname"><span class="pre">add_command</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Terminal.add_command" title="Link to this definition"></a></dt>
+<dd><p>Method that adds a command to the terminal.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – The command that the user wants add to the terminal.</p></li>
+<li><p><strong>function</strong> (<em>function</em>) – The function that must be executed when the command is called.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Terminal.add_progressbar">
+<span class="sig-name descname"><span class="pre">add_progressbar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Terminal.add_progressbar" title="Link to this definition"></a></dt>
+<dd><p>Method that adds a progressbar to the terminal.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – The name of the progressbar that is used to access it.</p></li>
+<li><p><strong>max</strong> (<em>int</em>) – Maximum of iterations.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Terminal.delete_progressbar">
+<span class="sig-name descname"><span class="pre">delete_progressbar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Terminal.delete_progressbar" title="Link to this definition"></a></dt>
+<dd><p>Method that deletes a progressbar.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em>) – The name of the to be deleted progressbar</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Terminal.update_progressbar">
+<span class="sig-name descname"><span class="pre">update_progressbar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amount</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Terminal.update_progressbar" title="Link to this definition"></a></dt>
+<dd><p>Method to update a progressbar by a variable amount.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – The progressbar that must be updated.</p></li>
+<li><p><strong>amount</strong> (<em>int</em>) – The amount of iterations that must be added to the progressbar.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">commands:</span></span></dt>
+<dd><p>A dictionary were the keys are commands and the value is the function to be executed.</p>
+</dd></dl>
+
+</dd></dl>
+
+<p>Terminal comes with the base commands:</p>
+<ul class="simple">
+<li><p>help: Lists all available commands in the terminal</p></li>
+<li><p>history: Shows the command history.</p></li>
+<li><p>clearhistory: Clears the command history.</p></li>
+<li><p>clearterminal: Clears the terminal text.</p></li>
+<li><p>clearall: Clears both the command history and terminal</p></li>
+</ul>
+<p>Example standard use of a terminal:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">PToolkit.LabControl</span> <span class="kn">import</span> <span class="n">Terminal</span>
+
+<span class="k">class</span> <span class="nc">blankinterface</span><span class="p">(</span><span class="n">Interface</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">Interface</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">terminal</span> <span class="o">=</span> <span class="n">Terminal</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">terminal</span><span class="o">.</span><span class="n">terminal_msg</span><span class="p">(</span><span class="s2">&quot;My first msg&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">terminal</span><span class="o">.</span><span class="n">terminal_msg</span><span class="p">(</span><span class="s2">&quot;This is a error&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">terminal</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span><span class="s2">&quot;myfunc&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">myfunc</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__GUI__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">terminal</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">myfunc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">terminal</span><span class="o">.</span><span class="n">terminal_msg</span><span class="p">(</span><span class="s2">&quot;Hello from myfunc&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>When running the code above and typing “myfunc” in the terminal will run the myfunc method.</p>
+<p>Example progressbar:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">PToolkit.LabControl</span> <span class="kn">import</span> <span class="n">Terminal</span>
+
+<span class="k">class</span> <span class="nc">blankinterface</span><span class="p">(</span><span class="n">Interface</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">Interface</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">terminal</span> <span class="o">=</span> <span class="n">Terminal</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">terminal</span><span class="o">.</span><span class="n">add_progressbar</span><span class="p">(</span><span class="s2">&quot;myprogress&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">terminal</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span><span class="s2">&quot;add&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">myfunc</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__GUI__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">terminal</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">myfunc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">terminal</span><span class="o">.</span><span class="n">update_progressbar</span><span class="p">(</span><span class="s2">&quot;myprogress&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>When running the code above and typing “myfunc” in the terminal will update the progressbar.</p>
+</section>
+<section id="data-displays-and-manipulation">
+<h3>Data displays and manipulation<a class="headerlink" href="#data-displays-and-manipulation" title="Link to this heading"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="Plot">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Plot</span></span><a class="headerlink" href="#Plot" title="Link to this definition"></a></dt>
+<dd><p>Class that creates a plot widget for live data plotting.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="Plot.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxpoints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">10)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diplayfps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Plot.__init__" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>root</strong> – Parent window</p></li>
+<li><p><strong>interval</strong> (<em>int</em>) – Interval in update function.</p></li>
+<li><p><strong>maxpoints</strong> (<em>int</em>) – Maximum amount of points to dispaly at any time.</p></li>
+<li><p><strong>ylim</strong> (<em>tuple</em>) – The limits of the y-axis</p></li>
+<li><p><strong>displayfps</strong> (<em>bool</em>) – Show the fps of the plot inside the plot.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Plot.set_xlabel">
+<span class="sig-name descname"><span class="pre">set_xlabel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Plot.set_xlabel" title="Link to this definition"></a></dt>
+<dd><p>Method to set the xlabel of the plot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>label</strong> (<em>str</em>) – The x label to set.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Plot.set_ylabel">
+<span class="sig-name descname"><span class="pre">set_ylabel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Plot.set_ylabel" title="Link to this definition"></a></dt>
+<dd><p>Method to set the y label of the plot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>label</strong> (<em>str</em>) – The y label to set.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">update_plot(x,</span> <span class="pre">y):</span></span></dt>
+<dd><p>Method to set the x and y values of the plot</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>list</em>) – List of x values</p></li>
+<li><p><strong>y</strong> (<em>list</em>) – List of y values</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Plot.appendy">
+<span class="sig-name descname"><span class="pre">appendy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Plot.appendy" title="Link to this definition"></a></dt>
+<dd><p>Method to append a vlaue to the y array. Automaticly increments x.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> (<em>float</em>) – Value that must be appended to the y-axis.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Plot.get_serial_devices">
+<span class="sig-name descname"><span class="pre">get_serial_devices</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Plot.get_serial_devices" title="Link to this definition"></a></dt>
+<dd><p>Method scans for available serial ports</p>
+</dd></dl>
+
+</dd></dl>
+
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">PToolkit.LabControl</span> <span class="kn">import</span> <span class="n">Plot</span>
+<span class="kn">import</span> <span class="nn">random</span>
+
+<span class="k">class</span> <span class="nc">blankinterface</span><span class="p">(</span><span class="n">Interface</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">Interface</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot</span> <span class="o">=</span> <span class="n">Plot</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
+
+        <span class="c1"># self.frame must be used instead of self for default tkinter objects.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">button</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frame</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Add&quot;</span><span class="p">,</span> <span class="n">command</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">myfunc</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__GUI__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">button</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">myfunc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">appendy</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+</pre></div>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="SevenSegmentDisplay">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SevenSegmentDisplay</span></span><a class="headerlink" href="#SevenSegmentDisplay" title="Link to this definition"></a></dt>
+<dd><p>Class that creates a seven segment display. Supports floats and ints.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="SevenSegmentDisplay.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">digits</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">negative_numbers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'hexagon'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SevenSegmentDisplay.__init__" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>root</strong> – Parent window</p></li>
+<li><p><strong>digits</strong> (<em>int</em>) – The amount of digits to display</p></li>
+<li><p><strong>negative_numbers</strong> (<em>bool</em>) – If negative numbers are allowed to be displayed. If true adds a digit for the negative sign.</p></li>
+<li><p><strong>style</strong> (<em>str</em>) – The style of the display <code class="xref py py-const docutils literal notranslate"><span class="pre">hexagon</span></code>, <code class="xref py py-const docutils literal notranslate"><span class="pre">rectangle</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="SevenSegmentDisplay.update_display">
+<span class="sig-name descname"><span class="pre">update_display</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SevenSegmentDisplay.update_display" title="Link to this definition"></a></dt>
+<dd><p>Method to update the display.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>num</strong> (<em>float</em>) – The value that must be displayed.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<p>The hexagon style:</p>
+<a class="reference internal image-reference" href="_images/hexagonstyle.PNG"><img alt="_images/hexagonstyle.PNG" src="_images/hexagonstyle.PNG" style="width: 300px;" /></a>
+<p>The rectangle style:</p>
+<a class="reference internal image-reference" href="_images/rectanglestyle.PNG"><img alt="_images/rectanglestyle.PNG" src="_images/rectanglestyle.PNG" style="width: 300px;" /></a>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">PToolkit.LabControl</span> <span class="kn">import</span> <span class="n">SevenSegmentDisplay</span>
+<span class="kn">import</span> <span class="nn">random</span>
+
+<span class="k">class</span> <span class="nc">blankinterface</span><span class="p">(</span><span class="n">Interface</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">Interface</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">display</span> <span class="o">=</span> <span class="n">SevenSegmentDisplay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="c1"># self.frame must be used instead of self for default tkinter objects.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">button</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frame</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Add&quot;</span><span class="p">,</span> <span class="n">command</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">myfunc</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__GUI__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">button</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">myfunc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">update_display</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+</pre></div>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="Display">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Display</span></span><a class="headerlink" href="#Display" title="Link to this definition"></a></dt>
+<dd><p>Class that creates a display. The display is a combination of three tkinter labels.
+The display can easyly updated with the get and update_display method.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The Display class inheritance from the parameter class.
+Therefore it functions as a Parameter.</p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="Display.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'-'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Display.__init__" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>root</strong> – Parent window</p></li>
+<li><p><strong>text</strong> (<em>str</em>) – The text that names the label</p></li>
+<li><p><strong>unit</strong> (<em>str</em>) – The text for the unit label/</p></li>
+<li><p><strong>font</strong> (<em>int</em>) – The font size of the labels</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Display.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Display.get" title="Link to this definition"></a></dt>
+<dd><p>Method to get the current value of the display</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The data displayed.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="Display.update_display">
+<span class="sig-name descname"><span class="pre">update_display</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Display.update_display" title="Link to this definition"></a></dt>
+<dd><p>Method to set a value on the display</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> (<em>str</em>) – The value that is set on the display.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">PToolkit.LabControl</span> <span class="kn">import</span> <span class="n">Display</span>
+<span class="kn">import</span> <span class="nn">random</span>
+
+<span class="k">class</span> <span class="nc">blankinterface</span><span class="p">(</span><span class="n">Interface</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">Interface</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">display</span> <span class="o">=</span> <span class="n">Display</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;Speed&quot;</span><span class="p">,</span> <span class="s2">&quot;m/s&quot;</span><span class="p">)</span>
+
+        <span class="c1"># self.frame must be used instead of self for default tkinter objects.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">button</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frame</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Test&quot;</span><span class="p">,</span> <span class="n">command</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">myfunc</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__GUI__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">button</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">myfunc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="c1"># Parameter behavior</span>
+        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">display</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">update_display</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+</pre></div>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="ParameterField">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ParameterField</span></span><a class="headerlink" href="#ParameterField" title="Link to this definition"></a></dt>
+<dd><p>Class that adds a parameter field. Similair to an entry only with a labels on its sides and parameter support.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The ParameterField class inheritance from the Parameter class.
+Therefore it functions as a parameter.</p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="ParameterField.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'-'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-999</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">999</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">increment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ParameterField.__init__" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>root</strong> – Parent window</p></li>
+<li><p><strong>text</strong> (<em>str</em>) – The text that names the label</p></li>
+<li><p><strong>unit</strong> (<em>str</em>) – The text for the unit label/</p></li>
+<li><p><strong>save</strong> (<em>bool</em>) – If the parameter must be saved in the .state file of the project, and if this value is loaded when restarting.</p></li>
+<li><p><strong>font</strong> (<em>int</em>) – The font size of the labels</p></li>
+<li><p><strong>from</strong> (<em>int</em>) – The min value of the spinbox</p></li>
+<li><p><strong>to</strong> (<em>int</em>) – The max value of the</p></li>
+<li><p><strong>increment</strong> (<em>float</em>) – The increment size of the spinbox</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ParameterField.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ParameterField.get" title="Link to this definition"></a></dt>
+<dd><p>Method to get the current value of the ParameterField</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The data displayed.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">PToolkit.LabControl</span> <span class="kn">import</span> <span class="n">Display</span>
+
+<span class="k">class</span> <span class="nc">blankinterface</span><span class="p">(</span><span class="n">Interface</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">Interface</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">speed</span> <span class="o">=</span> <span class="n">ParameterField</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;Speed&quot;</span><span class="p">,</span> <span class="s2">&quot;m/s&quot;</span><span class="p">)</span>
+
+        <span class="c1"># self.frame must be used instead of self for default tkinter objects.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">button</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frame</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Test&quot;</span><span class="p">,</span> <span class="n">command</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">myfunc</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__GUI__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">speed</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">button</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">myfunc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="c1"># Parameter behavior</span>
+        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">speed</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">speed</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="alignment">
+<h3>Alignment<a class="headerlink" href="#alignment" title="Link to this heading"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="VerticalAllign">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">VerticalAllign</span></span><a class="headerlink" href="#VerticalAllign" title="Link to this definition"></a></dt>
+<dd><p>Class that ads a frame that automaticly alligns widgets veritcaly.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This widget currently only works for: Display, ParameterField, SerialPortSelector, StatusLED, ScriptLoader and the PToolkit Button.</p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="VerticalAllign.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'-'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-999</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">999</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">increment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#VerticalAllign.__init__" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>root</strong> – Parent window</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<p>Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">PToolkit.LabControl</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">serial</span>
+
+<span class="k">class</span> <span class="nc">blankinterface</span><span class="p">(</span><span class="n">Interface</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">Interface</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">valign</span> <span class="o">=</span> <span class="n">VerticalAllign</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">serial</span> <span class="o">=</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span><span class="n">baudrate</span><span class="o">=</span><span class="mi">9600</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">portselector</span> <span class="o">=</span> <span class="n">SerialPortSelector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">valign</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">serial</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">var</span> <span class="o">=</span> <span class="n">ParameterField</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">valign</span><span class="p">,</span> <span class="s2">&quot;Value to send&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">button</span> <span class="o">=</span> <span class="n">Button</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">valign</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Send&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__GUI__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">valign</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/Valign.PNG"><img alt="_images/Valign.PNG" src="_images/Valign.PNG" style="width: 1000px;" /></a>
+</section>
+<section id="scripting">
+<h3>Scripting<a class="headerlink" href="#scripting" title="Link to this heading"></a></h3>
+<p>Scripts in PToolkit are saved in the scrips folder and must be written in Python.
+Every script must contain a main function that takes a single parameter. This parameter is a dictionary of the interfaces in your program, allowing you to use all parameters and command from your application.
+The docstring of the main function is used to tell others what the script does, this will be printed in the terminal. Scripts are loaded using a ScriptLoader:</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ScriptLoader">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ScriptLoader</span></span><a class="headerlink" href="#ScriptLoader" title="Link to this definition"></a></dt>
+<dd><p>A widget that can load scripts and execute the main function.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ScriptLoader.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Script:'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">terminal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'blank.py'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ScriptLoader.__init__" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>root</strong> – Parent window</p></li>
+<li><p><strong>text</strong> (<em>str</em>) – The text on the label.</p></li>
+<li><p><strong>terminal</strong> (<em>PToolkit.Terminal</em>) – PToolkit terminal object.</p></li>
+<li><p><strong>default</strong> (<em>str</em>) – Default script that must be selected.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ScriptLoader.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ScriptLoader.reset" title="Link to this definition"></a></dt>
+<dd><p>Selects the default script.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ScriptLoader.list_scripts">
+<span class="sig-name descname"><span class="pre">list_scripts</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ScriptLoader.list_scripts" title="Link to this definition"></a></dt>
+<dd><p>Reloads the script folder and prints the description to the terminal.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ScriptLoader.run_scripts">
+<span class="sig-name descname"><span class="pre">run_scripts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scriptname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ScriptLoader.run_scripts" title="Link to this definition"></a></dt>
+<dd><p>The name of the script file that must be executed. File must be in the scripts folder.</p>
+</dd></dl>
+
+</dd></dl>
+
+<p>For the example we use the following interface with name “blank”:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">PToolkit.LabControl</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="k">class</span> <span class="nc">blankinterface</span><span class="p">(</span><span class="n">Interface</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">Interface</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">terminal</span> <span class="o">=</span> <span class="n">Terminal</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">var</span> <span class="o">=</span> <span class="n">ParameterField</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;Variable&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">loader</span> <span class="o">=</span> <span class="n">ScriptLoader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">terminal</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">terminal</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">__GUI__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">terminal</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loader</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">var</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">mymethod</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">terminal</span><span class="o">.</span><span class="n">terminal_msg</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;This is mymethod speaking var is: </span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We can access the blank interface in the script by using it as a key in the interfaces parameter.
+A simple script could look like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># The main function will be called by the script loader</span>
+<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">interfaces</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This is the doc on my script&quot;&quot;&quot;</span>
+
+    <span class="c1"># Getting the blank interface</span>
+    <span class="n">interface</span> <span class="o">=</span> <span class="n">interfaces</span><span class="p">[</span><span class="s2">&quot;blank&quot;</span><span class="p">]</span>
+
+    <span class="c1"># Getting the parameterfield</span>
+    <span class="n">var</span> <span class="o">=</span> <span class="n">interface</span><span class="o">.</span><span class="n">var</span>
+
+    <span class="c1"># Priting the variable to the</span>
+    <span class="n">interface</span><span class="o">.</span><span class="n">terminal</span><span class="o">.</span><span class="n">terminal_msg</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Our variable is currently: </span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Calling a method from the interface</span>
+    <span class="n">interface</span><span class="o">.</span><span class="n">mymethod</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Running this code you will see the messages in the terminal. The ScriptLoader comes with a few commands for in the terminal:</p>
+<ul class="simple">
+<li><p>reloadscripts: Reloads the script folder, and shows all available scripts in the terminal with docstrings.</p></li>
+<li><p>runscript: Runs the currently selected script.</p></li>
+<li><p>reset: Resets the scriptloader to the default script.</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Tools.html" class="btn btn-neutral float-left" title="Tools" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Deprecated.html" class="btn btn-neutral float-right" title="Deprecated" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, JDVHA.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

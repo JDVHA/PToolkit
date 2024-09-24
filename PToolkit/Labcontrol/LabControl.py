@@ -4,7 +4,9 @@ from matplotlib.animation import FuncAnimation
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
+import importlib
 from tkinter import ttk
+import datetime, math
 import numpy as np
 from serial.tools.list_ports import comports
 
@@ -18,9 +20,7 @@ logging.basicConfig(
 PTOOLKITLOGGER = logging.getLogger()
 PTOOLKITLOGGER.setLevel(logging.DEBUG)
 
-
 INIT_FASE = True
-
 
 class MainPToolkitApp(tk.Tk):
     def __init__(self, appname, *kwargs, **args):
@@ -28,41 +28,54 @@ class MainPToolkitApp(tk.Tk):
         self.name = appname
         self.interfaces = []
         self.interfacenames = []
+
+        self.interfaces = {}
+
         self.exitfunc = lambda: print("")
         self.protocol("WM_DELETE_WINDOW", self.StopApp)
         self.title(self.name)
 
+        scriptpath = sys.path[0] + "\\scripts" + "\\"
+
+        sys.path.append(scriptpath)
+
     def mainloop(self):
-        self.StartApp()
+        self.startApp()
         self.tk.mainloop()
     
-    def StartApp(self):
+    def startApp(self):
         global INIT_FASE
         if not INIT_FASE:
             raise SystemError("""INIT_FASE was false. Possible causes: INIT_FASE was changed in the program by the user. Or a second App was created, a maximum of 1 App may exist per program.""")
+        
+        for interface in list(self.interfaces.values()):
+            interface.__GUI__()
+        
         INIT_FASE = False
 
         PTOOLKITLOGGER.info(f"Just started the main application.")
 
-    def Set_ExitFunc(self, func):
+    def set_exit_func(self, func):
         self.exitfunc = func
 
     def StopApp(self):
         if tk.messagebox.askokcancel("Quit", f"Do you want to quit {self.name}?"):
             self.exitfunc()
-            for interface in self.interfaces:
-                interface.Stop()
+            for interface in list(self.interfaces.values()):
+                interface.stop()
                 del interface
+            PTOOLKITLOGGER.info(f"Stopping the main application.")
             self.destroy()
+            sys.exit()
+
 
     def AppendInterface(self, interface):
-        if interface.name in self.interfacenames:
+        if interface.name in list(self.interfaces.keys()):
             raise NameError(f"Interface with name: {interface.name} already exists.")
         else:
-            self.interfacenames.append(interface.name)
-            self.interfaces.append(interface)
-       
 
+            self.interfaces[interface.name] = interface
+       
 class Interface:
     def __init__(self, master, name):
         self.classname = self.__class__.__name__
@@ -84,7 +97,9 @@ class Interface:
         #            self.commands[name] = getattr(self, i)
 
         PTOOLKITLOGGER.debug(f"Finished post init of an {self.classname} instance.")        
-        
+    
+    def __GUI__(self):
+        pass
 
     def RegisterCommand(name, links=[]):
         
@@ -116,13 +131,10 @@ class Interface:
     def pack(self, *args, **kwargs):
         self.frame.pack(*args, **kwargs)
 
-    def Stop(self):
+    def stop(self):
         for child in self.frame.winfo_children():
             if issubclass(type(child), Parameter) == True:
                 child.Save()
-
-
-
 
 class Parameter:
     def __init__(self, source, name=None, save=False):
@@ -287,10 +299,10 @@ class Parameter:
         val = self.source()
         return str(val)
     
-
 class VerticalAllign(tk.Frame):
     def __init__(self, root):
         tk.Frame.__init__(self, root.frame)
+        self.root = root
         self.frame = root.frame
         self.name = root.name
 
@@ -300,7 +312,7 @@ class VerticalAllign(tk.Frame):
     def Make_Grid(self):
         m, n = 0, 0
         for row in self.widget_grid:
-
+            #print(row, "\n")
             for widget in row:
                 widget.grid(row=m, column=n, sticky='nesw')
                 n += 1
@@ -317,19 +329,39 @@ class VerticalAllign(tk.Frame):
         self.Make_Grid()
         super(tk.Frame, self).grid(*args, **kwargs)
 
-class PToolkitWidgetBase:
-    def __init__(self, master, content):
-        
-        if isinstance(master, VerticalAllign):
-            widgets = content
+class PToolkitWidgetBase(tk.Frame):
+    def __init__(self, root):
+        self.x = False
+
+        if isinstance(root, VerticalAllign):
+
+            self.master = root
+
+        else: 
+            self.x = True
+            try:
+                tk.Frame.__init__(self, root.frame)
+            except:
+                tk.Frame.__init__(self, root)
+            self.master = self
+    
+    def __SETWIDGETS__(self, content):
+        self.widgets = content
+        m, n = 0, 0
+
+        if self.x == True:
+            for row in self.widgets:
+
+                for widget in row:
+
+                    widget.grid(row=m, column=n)
+                    n += 1
+                n = 0
+                m += 1
         
         else:
-            pass
-
-
-    def __new___(cls, *args, **kwargs):
-        pass
-        
+            for row in self.widgets:
+                self.master.widget_grid.append(row)
 
 class KeyBoard(tk.Frame):
     def __init__(self, root, grid, textgrid=None, commandgrid=None, imagegrid=None):    
@@ -456,64 +488,25 @@ class ArrowKeyPad(KeyBoard):
         ]
 
         KeyBoard.__init__(self, root, grid, imagegrid=imagegrid)
-
-
         
-        
-
-    
-
-
-class Button(tk.Button):
-    def __init__(self, root, *args, **kwargs):
-               
-
-        if isinstance(root, VerticalAllign):
-            master = root
-            self.Button = tk.Button(master, *args, **kwargs)
-            widgets = [
-                self.Button
-            ]
-            master.widget_grid.append(widgets)
-
-        else:
-            tk.Button.__init__(self, root, *args, **kwargs) 
-        
-        
-
-
-
-class Display(tk.Frame, Parameter):
+class Display(Parameter, PToolkitWidgetBase):
     def __init__(self, root, text="", unit="-", font=2):
-        tk.Frame.__init__(self, root.frame)
-
-        if isinstance(root, VerticalAllign):
-            master = root
-        
-        else:
-            master = self
-
+        PToolkitWidgetBase.__init__(self, root)
 
         self.unit = unit
         self.text = text 
 
         self.textvariable = tk.StringVar()
 
-        self.textlabel = tk.Label(master, text=self.text, font=font, anchor="w")
-        self.displaylabel = tk.Label(master, textvariable=self.textvariable, font=font)
-        self.unitlabel = tk.Label(master, text=self.unit, font=font)
-        if isinstance(root, VerticalAllign):
-            widgets = [
-                self.textlabel,
-                self.displaylabel,
-                self.unitlabel
-            ]
-            master.widget_grid.append(widgets)
+        self.textlabel = tk.Label(self.master, text=self.text, font=font, anchor="w")
+        self.displaylabel = tk.Label(self.master, textvariable=self.textvariable, font=font)
+        self.unitlabel = tk.Label(self.master, text=self.unit, font=font)
 
-        else:
-            self.textlabel.grid(row=0, column=0)
-            self.displaylabel.grid(row=0, column=1)
-            self.unitlabel.grid(row=0, column=2)
+        self.__SETWIDGETS__(
+            [
+                [self.textlabel, self.displaylabel, self.unitlabel]
+            ]
+        )
 
         self.textvariable.set("0")
         Parameter.__init__(self, self.get)
@@ -521,29 +514,23 @@ class Display(tk.Frame, Parameter):
     def get(self):
         return self.textvariable.get()
     
-    def set(self, value):
+    def update_display(self, value):
         if isinstance(value, ParameterField):
             value = value.get()
         self.textvariable.set(value)
         
-
-class ParameterField(tk.Frame, Parameter):
+class ParameterField(Parameter, PToolkitWidgetBase):
     def __init__(self, root, text="", unit="-", font=2, save=True, from_=-999, to=999, increment=0.1):
-        tk.Frame.__init__(self, root.frame)
-        if isinstance(root, VerticalAllign):
-            master = root
-        
-        else:
-            master = self
+        PToolkitWidgetBase.__init__(self, root)
         
         self.variable = tk.StringVar()
 
         self.unit = unit
         self.text = text 
         
-        self.textLabel = tk.Label(master, text=self.text, font=font, anchor="w")
-        self.spinBox = tk.Spinbox(master, font=font, from_=from_, to=to, textvariable=self.variable, increment=0.1)
-        self.unitlabel = tk.Label(master, text=self.unit, font=font)
+        self.textLabel = tk.Label(self.master, text=self.text, font=font, anchor="w")
+        self.spinBox = tk.Spinbox(self.master, font=font, from_=from_, to=to, textvariable=self.variable, increment=0.1)
+        self.unitlabel = tk.Label(self.master, text=self.unit, font=font)
 
         parametername = f"{root.name}:{text}[{unit}]"
         Parameter.__init__(self, self.get, name=parametername, save=True)
@@ -557,65 +544,50 @@ class ParameterField(tk.Frame, Parameter):
             self.variable.set("0")
 
 
-        if isinstance(root, VerticalAllign):
-            widgets = [
-                self.textLabel,
-                self.spinBox,
-                self.unitlabel
+        self.__SETWIDGETS__(
+            [
+                [self.textLabel, self.spinBox, self.unitlabel]
             ]
-            master.widget_grid.append(widgets)
-
-        else:
-            self.textLabel.grid(row=0, column=0, sticky='nesw')
-            self.spinBox.grid(row=0, column=1, sticky='nesw')
-            self.unitlabel.grid(row=0, column=2, sticky='nesw')
+        )
     
 
     def get(self):
         return self.spinBox.get()
     
-class SerialPortSelector(tk.Frame):
+class SerialPortSelector(PToolkitWidgetBase):
     
     def __init__(self, root, serial, text="Serial devices: ", terminal=None):
-        tk.Frame.__init__(self, root.frame)
-        if isinstance(root, VerticalAllign):
-            master = root
-        
-        else:
-            master = self
+        PToolkitWidgetBase.__init__(self, root)
         
         self.serial = serial
         self.terminal = terminal
         self.lastselect = None
 
-        self.label = tk.Label(master, text=text, anchor="w")
-        self.combobox = ttk.Combobox(master)
-        self.combobox.bind("<<ComboboxSelected>>", self.Set_port)
-        self.button = tk.Button(master, text="\u27F3", command=self.Get_serial_devices)
+        self.label = tk.Label(self.master, text=text, anchor="w", font=2)
+        self.combobox = ttk.Combobox(self.master)
+        self.combobox.bind("<<ComboboxSelected>>", self.set_port)
+        self.button = tk.Button(self.master, text="\u27F3", command=self.get_serial_devices)
         
-        if isinstance(root, VerticalAllign):
-            widgets = [
-                self.label,
-                self.combobox,
-                self.button
+        self.__SETWIDGETS__(
+            [
+                [self.label, self.combobox, self.button]
             ]
-            master.widget_grid.append(widgets)
-        else:
-            self.label.grid(row=0, column=0)
-            self.combobox.grid(row=0, column=1)
-            self.button.grid(row=0, column=2)
+        )
 
         if self.terminal != None:
-            self.terminal.Add_Command("reloadserial", self.Get_serial_devices)
+            self.terminal.add_command("reloadserial", self.get_serial_devices)
             
-        self.Get_serial_devices()
+        self.get_serial_devices()
 
-    def Set_port(self, e):
+    def set_port(self, port=None):
         device = self.combobox.current()
+        if type(port) != type(""):
+            port = list(self.devices.values())[device]
+        
         if self.lastselect == device:
             self.serial.close()
        
-        self.serial.port = list(self.devices.values())[device]
+        self.serial.port = port
         self.serial.open()
 
               
@@ -624,18 +596,18 @@ class SerialPortSelector(tk.Frame):
             device_name = list(self.devices.keys())[device]
 
             if self.serial.is_open and self.lastselect == device:
-                self.terminal.Terminal_msg(f"Serial connection with {device_name} is re established.")
+                self.terminal.terminal_msg(f"Serial connection with {device_name} is re established.")
 
             elif self.serial.is_open:
-                self.terminal.Terminal_msg(f"Serial connection with {device_name} is established.")
+                self.terminal.terminal_msg(f"Serial connection with {device_name} is established.")
 
             else:
-                self.terminal.Terminal_msg(f"Serial connection with {device_name} has failed.", True)
+                self.terminal.terminal_msg(f"Serial connection with {device_name} has failed.", True)
 
             self.lastselect = device
 
-    def Get_serial_devices(self):
-        """Get serial ports for available devices"""
+    def get_serial_devices(self):
+        """Scan for available devices"""
         available_ports = comports()
         self.devices = {}
         
@@ -643,17 +615,25 @@ class SerialPortSelector(tk.Frame):
             self.devices[device] = port
 
         self.combobox['values'] = list(self.devices.keys())
-
-    
+  
 class Terminal(tk.LabelFrame):
-    def __init__(self, root, text=None, allowcommands=True):
+    def __init__(self, root, text=None, allowcommands=True, width=60, height=10):
         super().__init__(root.frame, text=text)
         self.commands = {
-            "list": self.List_commands
+            "help": self.list_commands,
+            "history": self.show_history,
+            "clearhistory": self.clear_history,
+            "clearterminal": self.clear_terminal,
+            "clearall": self.clear_all,
         }
 
+        self.commandhistory = [""]
+        self.counter = 0
+
+        self.progressbars = {}
+
         scrollbar = tk.Scrollbar(self)
-        self.terminal = tk.Text(self, wrap="word", yscrollcommand=scrollbar.set, width=30, height=10)
+        self.terminal = tk.Text(self, wrap="word", yscrollcommand=scrollbar.set, width=width, height=height)
         self.terminal.tag_config("ERROR", foreground="red")
         scrollbar.config(command=self.terminal.yview)
         
@@ -665,71 +645,183 @@ class Terminal(tk.LabelFrame):
             self.entry = tk.Entry(self)
             self.entry.grid(row=1, column=0, sticky="NWSE")
 
-            self.sendbutton = tk.Button(self, text="send", command=lambda: self.Run_Command(self.entry.get()))
+            self.sendbutton = tk.Button(self, text="send", command=lambda: self.run_Command(self.entry.get()))
             self.sendbutton.grid(row=1, column=1)
 
-            self.entry.bind('<Return>', self.Entry_Run)
+            self.entry.bind('<Return>', self.entry_Run)
+            self.entry.bind('<Up>', lambda x: self.prev_command(-1, x))
+            self.entry.bind('<Down>', lambda x: self.prev_command(1, x))
+    
+    def prev_command(self, val, e):
         
-    def Terminal_msg(self, msg, error=False):
+        if -len(self.commandhistory) < self.counter+val <= 0:
+
+            command = self.commandhistory[self.counter + val]
+            self.entry.delete(0,tk.END)
+            self.entry.insert(0,command)
+            self.counter += val
+
+    def show_history(self):
+        """Prints the command history to the terminal"""
+
+        self.terminal_msg("Command history: ")
+        command_list = list(self.commands.keys())
+        
+        for command in self.commandhistory[1:]:
+
+            if command in command_list:
+                self.terminal_msg(f"\t\u2611{command}")   
+            else:
+                self.terminal_msg(f"\t\u2610{command}") 
+    
+    def clear_history(self):
+        """Erase the command history"""
+
+        self.terminal_msg("Erasing the command history...")
+        self.counter = 0    
+        self.commandhistory = [""]
+
+    def clear_terminal(self):
+        """Clears the terminal"""
+
         self.terminal.config(state=tk.NORMAL)
-        if error:
-            self.terminal.insert(tk.END, f"ERROR: {msg}\n", "ERROR")
-        else:
-            self.terminal.insert(tk.END, f"{msg}\n")
+        self.terminal.delete("1.0", tk.END)
         self.terminal.config(state=tk.DISABLED)
         self.terminal.see("end")
-    
-    def List_commands(self):
+
+    def clear_all(self):
+        """Clear terminal and command history"""
+
+        self.clear_history()
+        self.clear_terminal()
+
+    def terminal_msg(self, msg, error=False):
+        if msg != None:
+            self.terminal.config(state=tk.NORMAL)
+            if error:
+                self.terminal.insert(tk.END, f"ERROR: {msg}\n", "ERROR")
+            else:
+                self.terminal.insert(tk.END, f"{msg}\n")
+            self.terminal.config(state=tk.DISABLED)
+            self.terminal.see("end")
+        
+    def list_commands(self):
         """Lists all the commands available in terminal."""
 
-        self.Terminal_msg("Available commands:")
+        self.terminal_msg("Available commands:")
         for name, function in self.commands.items():  
-            self.Terminal_msg(f"\t{name}: {function.__doc__}")
+            self.terminal_msg(f"\t-{name}: {function.__doc__}")
 
-    def Entry_Run(self, e):
-        self.Run_Command(self.entry.get())
+    def entry_Run(self, e):
+        self.run_Command(self.entry.get())
 
-    def Run_Command(self, command):
+    def run_Command(self, command):
+        self.commandhistory.append(command)
+        self.counter = 0
 
-        self.Terminal_msg(f"Input: {command}")
+        self.terminal_msg(f"Input: {command}")
 
         # Decoder required
         try:
             self.commands[command]()
+            
         except KeyError as e:
-            self.Terminal_msg("Unkown command", True)
+            self.terminal_msg("Unkown command", True)
 
+        
         self.entry.delete(0, 'end')
 
-    def Add_Command(self, name, function):
+    def add_command(self, name, function):
         self.commands[name] = function
 
-class StatusLED(tk.Frame):
+    def add_progressbar(self, name, max):
+
+        line = self.terminal.get("1.0", tk.END).count("\n")
+        
+        self.progressbars[name] = [line, 0, max, time.time()]
+
+        self.update_progressbar(name, 0)
+
+    def update_terminal_line(self, line, updatedtext):
+        self.terminal.config(state=tk.NORMAL)
+
+        self.terminal.delete(f"{line}.0", "1.999999999999")
+        self.terminal.insert(f"{line}.0", updatedtext)
+
+        self.terminal.config(state=tk.DISABLED)
+        self.terminal.see("end")
+
+    def delete_progressbar(self, name):
+        del self.progressbars[name]
+
+
+    def update_progressbar(self, name, amount=1):
+
+        line, current, max, startime = self.progressbars[name]
+        
+        new_current = current + amount
+
+        self.progressbars[name][1] = new_current
+
+        iteration_time = np.round(time.time()-startime, 2)
+        estimatedtime = np.round((max-new_current)*iteration_time,2)
+        estimatedtime_str = str(datetime.timedelta(seconds=estimatedtime))
+        self.progressbars[name][3] = time.time()
+
+        percentage = new_current/max * 100
+
+        hashtagcount = int(math.floor(percentage/10))
+        dashcount = 10-hashtagcount
+
+
+        new_line = f"{name}: [" + "#"*hashtagcount + "-"*dashcount + f"]{new_current}/{max} [{estimatedtime_str}, {iteration_time} s/it]"
+        
+        # Bug fix
+        if amount == 0:
+            new_line += "\n"
+            
+
+        if not new_current > max:
+
+            self.update_terminal_line(line, new_line)
+
+        else:
+            self.terminal_msg("Process tries to update finished progressbar.", True)
+    
+class StatusLED(PToolkitWidgetBase):
     def __init__(self, root, text=None):
-        tk.Frame.__init__(self, root.frame)
+        PToolkitWidgetBase.__init__(self, root)
+
         self.text = text
         BASEDIR = os.path.dirname(os.path.abspath(__file__))
         
-        self.red = tk.PhotoImage(file=BASEDIR + "\\assets\\greenled.PNG", master=self).subsample(7, 7) 
-        self.green = tk.PhotoImage(file=BASEDIR + "\\assets\\redled.PNG", master=self).subsample(7, 7) 
+        self.red = tk.PhotoImage(file=BASEDIR + "\\assets\\greenled.PNG", master=self.master).subsample(7, 7) 
+        self.green = tk.PhotoImage(file=BASEDIR + "\\assets\\redled.PNG", master=self.master).subsample(7, 7) 
 
-        self.LEDlabel = tk.Label(self, image=self.red)
+        self.LEDlabel = tk.Label(self.master, image=self.red)
         self.state = False
 
         if self.text != None:
-            self.textlabel = tk.Label(self, text=text)
-            self.textlabel.grid(row=0, column=0)
-            self.LEDlabel.grid(row=0, column=1)
+            self.textlabel = tk.Label(self.master, text=text)
+            self.__SETWIDGETS__(
+                [
+                    [self.textlabel, self.LEDlabel]
+                ]
+            )
         else:
-            self.LEDlabel.pack()
+            self.__SETWIDGETS__(
+                [
+                    [self.LEDlabel]
+                ]
+            )
             
 
-    def Toggle_State(self):
+    def toggle_state(self):
         self.state = not self.state
 
-        self.Update_label()
+        self.update_label()
 
-    def Set_State(self, state):
+    def set_state(self, state):
 
         if state == True or state == False:
             self.state = state
@@ -737,9 +829,9 @@ class StatusLED(tk.Frame):
         else:
             raise TypeError("State must be True or False")
         
-        self.Update_label()
+        self.update_label()
     
-    def Update_label(self):
+    def update_label(self):
         if self.state == True:
             self.LEDlabel.config(image=self.green)
         elif self.state == False:
@@ -748,12 +840,13 @@ class StatusLED(tk.Frame):
         else:
             raise TypeError("State must be a boolean")
 
-    def Get_State(self):
+    def get_state(self):
         return self.state
 
 class Plot(tk.Frame):
-    def __init__(self, root, interval=10, blit=False, maxpoints=50, ylim=(0, 10), diplayfps=False):
+    def __init__(self, root, interval=10, maxpoints=50, ylim=(0, 10), diplayfps=False):
         tk.Frame.__init__(self, root)
+        blit=False
         self.x = []
         self.y = []
         self.maxpoints = maxpoints
@@ -786,9 +879,9 @@ class Plot(tk.Frame):
         self.canvas.get_tk_widget().pack(kwargs)
 
     def Animation(self, i):
-        # Improved animation speed achieved using following stacoverflow example:
+        # Improved animation speed achieved using following stackoverflow example:
         # https://stackoverflow.com/a/40139416
-        self.Update()
+        self.update()
        
         self.line.set_data(self.x, self.y)
         
@@ -809,33 +902,34 @@ class Plot(tk.Frame):
         
         
 
-    def Update(self): 
+    def update(self): 
         if len(self.x) >= self.maxpoints + 1:
             self.x = self.x[1:self.maxpoints + 1]
 
         if len(self.y) >= self.maxpoints + 1:
             self.y = self.y[1:self.maxpoints + 1]
 
-    def UpdatePlot(self, x=[], y=[], z=[]):
+    def update_plot(self, x=[], y=[]):
         self.x = x
         self.y = y
-        self.z = z
         
-    def Appendy(self, value):
+    def appendy(self, value):
         if len(self.y) >= self.maxpoints:
             self.y.pop(0)
+
         self.y.append(value)
+
         if len(self.x) > 0:
             if max(self.x) >= self.maxpoints:
                 pass
             else:
-                self.Increment("x")
+                self.increment("x")
         else:
-            self.Increment("x")
+            self.increment("x")
 
         
 
-    def Increment(self, variable):
+    def increment(self, variable):
         if variable == "x":
             if len(self.x) > 0:
                 self.x.append(self.x[-1]+1)
@@ -847,11 +941,6 @@ class Plot(tk.Frame):
                 self.y.append(self.y[-1]+1)
             else:
                 self.y.append(1)
-        
-
-        if variable == "z":
-            pass
-
 
 class TkTable(tk.LabelFrame):
     def __init__(self, master, dataframe, text=None):
@@ -936,12 +1025,11 @@ class TkTable(tk.LabelFrame):
         self.dataframe[col][row] = var.get()
         self.Update()
 
-
 class BaseThread:
     """
     Base class for the producer-consumer threads. 
     """
-    def __init__(self, name, queue, interval):
+    def __init__(self, name, queue, interval, terminal=None):
         # Init base class
         
         self.thread = None
@@ -954,12 +1042,19 @@ class BaseThread:
         self.alive = False
         self.name = name
 
+        self.terminal = terminal
+
+        if self.terminal != None:
+            self.terminal.add_command(f"onT {name}", self.start)
+            self.terminal.add_command(f"offT {name}", self.stop)
+            self.terminal.add_command(f"toggleT {name}", self.toggle)
+
     def run(self):
        
         # Start loop aslong as the thread is alive
         while self.alive:
             # Execute the inner thread
-            self.Thread_inside()
+            self.thread_inside()
             # Sleep if needed
             if self.interval != None:
                 time.sleep(self.interval)
@@ -969,33 +1064,38 @@ class BaseThread:
                 time.sleep(0.5)
                 PTOOLKITLOGGER.debug(f"Thread {self.name} is using a queue with current size: {self.queue.qsize()}.")
 
-    def Thread_inside(self):
+    def thread_inside(self):
        pass
 
-    def Start(self):
-        
+    def start(self):
+        f"""Start the thread"""
         self.thread = threading.Thread(target=self.run, daemon=True)
 
-        PTOOLKITLOGGER.debug(f"Starting thread: {self.name}")
+        PTOOLKITLOGGER.info(f"Starting thread: {self.name}")
         # Set the thread active
         self.alive = True
+        if self.terminal != None and not INIT_FASE:
+            self.terminal.terminal_msg(f"Starting thread: {self.name}")
 
         self.thread.start()
 
-    def Stop(self):
+
+    def stop(self):
+        """Stop the thread"""
+
+        if self.terminal != None and not INIT_FASE:
+            self.terminal.terminal_msg(f"Stopping thread: {self.name}")
         
-        PTOOLKITLOGGER.debug(f"Stopping thread: {self.name}")
+        PTOOLKITLOGGER.info(f"Stopping thread: {self.name}")
         self.alive = False
 
-    def Toggle(self):
-        
+    def toggle(self):
+        """Toggle the thread"""
         if self.alive == True:
             self.Stop()
 
         elif self.alive == False:
-            self.Start()
-
-    
+            self.Start()    
 
 class ProducerThread(BaseThread):
     """
@@ -1023,12 +1123,11 @@ class ProducerThread(BaseThread):
         -------
         None
         """
-        BaseThread.__init__(self, name, queue, interval)
+        BaseThread.__init__(self, name, queue, interval, terminal)
         self.generationfunction = generationfunction
-        self.terminal = terminal
         
 
-    def Thread_inside(self):
+    def thread_inside(self):
         """
         Inside of the thread method. Executes the generationfunction and puts the
         result in the queue.
@@ -1052,7 +1151,7 @@ class ProducerThread(BaseThread):
         else:
             msg = f"Data overflow in queue, thread {self.name} cannot add more data. Data is currently being lost!!! Increase queue size or increase processing speed."
             if self.terminal != None:
-                self.terminal.Terminal_msg(msg, True) 
+                self.terminal.terminal_msg(msg, True) 
    
             
             PTOOLKITLOGGER.warning(msg)
@@ -1084,12 +1183,11 @@ class ConsumerThread(BaseThread):
         -------
         None
         """
-        BaseThread.__init__(self, name, queue, interval)
+        BaseThread.__init__(self, name, queue, interval, terminal)
         self.consumerfunction = consumerfunction
-        self.terminal = terminal
         
 
-    def Thread_inside(self):
+    def thread_inside(self):
         """
         Inside of the thread method. Executes the generationfunction and puts the
         result in the queue
@@ -1112,7 +1210,6 @@ class ConsumerThread(BaseThread):
 
         else:
             time.sleep(self.interval)
-
 
 class Digit:
     def __init__(self, canvas, offsetx, offsety, length=30, style="rectangle"):
@@ -1188,7 +1285,7 @@ class Digit:
                 offsetx = baseoffset + i[1]*b+2*a + i[3] + x
                 offsety = baseoffset + i[2]*b+2*a + i[4] + y
 
-                points = self.Get_points(a, b, offsetx, offsety, mode=mode)
+                points = self.get_points(a, b, offsetx, offsety, mode=mode)
                 seg = self.canvas.create_polygon(points, fill="gray")
                 self.segments.append(seg)
 
@@ -1200,7 +1297,7 @@ class Digit:
 
         self.dot = self.canvas.create_oval(xc0, yc0, xc1, yc1, fill="black", width=0)
     
-    def Get_points(self, a, b, offsetx, offsety, mode):
+    def get_points(self, a, b, offsetx, offsety, mode):
         points_v = [
                 offsetx+a, 0 + offsety,
                 offsetx+2*a, a + offsety,
@@ -1223,7 +1320,7 @@ class Digit:
         elif mode == "v":
             return points_v
         
-    def Update(self, char):
+    def update(self, char):
 
         binarysegments = self.digits[char]
 
@@ -1237,14 +1334,13 @@ class Digit:
 
             self.canvas.itemconfigure(iid, fill=color)
     
-    def Setdot(self, state):
+    def setdot(self, state):
         if state == True:
             color = "red"
 
         else:
             color = "black"
         self.canvas.itemconfigure(self.dot, fill=color)
-
 
 class SevenSegmentDisplay(tk.Frame):
     def __init__(self, root, digits, negative_numbers=True, style="hexagon"):
@@ -1276,17 +1372,17 @@ class SevenSegmentDisplay(tk.Frame):
             self.digits.append(Digit(self.canvas, 10+(self.length+spacing)*i, 10, self.length, style=style))
         
         for i in self.digits:
-            i.Update(" ")
+            i.update(" ")
 
         
 
-    def UpdateDisplay(self, num):
+    def update_display(self, num):
         string = str(num)
 
         if num > 0 and self.negative_numbers == True:
             string = " " + string
 
-        self.digits[self.lastdot].Setdot(False)
+        self.digits[self.lastdot].setdot(False)
 
         if "." in string:   
             
@@ -1295,18 +1391,151 @@ class SevenSegmentDisplay(tk.Frame):
             self.lastdot = pos-1
 
             string = string.replace(".", "")
-            self.digits[self.lastdot].Setdot(True)
+            self.digits[self.lastdot].setdot(True)
 
         for i in range(len(self.digits)):
 
             if i < len(string):
-                self.digits[i].Update(string[i])
+                self.digits[i].update(string[i])
             
             else:
-                self.digits[i].Update(" ")
-
+                self.digits[i].update(" ")
         
-                
+class ScriptLoader(PToolkitWidgetBase):
+
+    def __init__(self, root, text="Script:", terminal=None, default="blank.py"):
+        PToolkitWidgetBase.__init__(self, root)
+
+        self.default = default
+        self.root = root
+
+        self.scripts = []
+        self.terminal = terminal
+
+        runscript_wrapper = lambda: self.run_script(self.scripts[self.combobox.current()].replace(".py", ""))
+        runscript_wrapper.__doc__ =  """Run the currently selected script."""
+        
+        if self.terminal != None:
+            self.terminal.add_command("reloadscripts", self.list_scripts)
+            self.terminal.add_command("runscript", runscript_wrapper)
+            self.terminal.add_command("reset", self.reset)
+
+        self.label = tk.Label(self.master, text=text, font=2, anchor="w")
+        self.combobox = ttk.Combobox(self.master)
+        self.button = tk.Button(self.master, text="Run script", command=runscript_wrapper)
+        self.__SETWIDGETS__(
+                [
+                    [self.label, self.combobox, self.button]
+                ]
+            )
+
+        self.list_scripts()
+
+        if default in self.scripts:
+            self.combobox.set(default)
+
+    def reset(self):
+        """Reseting to default script"""
+
+        if not INIT_FASE and self.terminal != None:
+            self.terminal.terminal_msg(f"Reseting script to {self.default}")
+
+        if self.default in self.scripts:
+            self.combobox.set(self.default)
+
+        elif not INIT_FASE and self.terminal != None:
+            self.terminal.terminal_msg(f"No default script selected.")
+
+    def list_scripts(self):
+        """Reload script folder"""
+
+        path = sys.path[0] + "\\scripts"
+
+
+        if not INIT_FASE and self.terminal != None:
+            n = 0
+            for file in os.listdir(path):
+                if file.endswith(".py"):
+                    n+=1
+            self.terminal.terminal_msg(f"Reloading scripts, found: {n}")
+
+        self.scripts = []
+
+        for file in os.listdir(path):
+            if file.endswith(".py"):
+                if not INIT_FASE and self.terminal != None:
+                    script = importlib.import_module(file.replace(".py", ""))
+                    mainfunc = getattr(script, "main")
+                    description = mainfunc.__doc__
+
+                    self.terminal.terminal_msg(f"\t- {file}: {description}")
+
+                self.scripts.append(file)
+
+
+        self.combobox['values'] = self.scripts
+
+    def run_script(self, scriptname):
+        """Run the currently selected script."""
+        
+        #scriptname = self.scripts[self.combobox.current()].replace(".py", "")
+
+        try:
+            script = importlib.import_module(scriptname)
+
+            mainfunc = getattr(script, "main")
             
+            try:
+                interfaces = self.root.master.interfaces
+            except: 
 
+                try:
+                    interfaces = self.root.root.master.interfaces
+                except: 
+                    PTOOLKITLOGGER.error(f"Cannot locate main app. Running script without interfaces")
+                    if self.terminal != None:
+                        self.terminal.terminal_msg(f"Cannot locate main app. Running script without interfaces.")
+                    interfaces = {}
 
+            PTOOLKITLOGGER.info(f"Running script: {scriptname}")
+
+            if self.terminal != None:
+                self.terminal.terminal_msg(f"Running script: {scriptname} ....")
+                self.terminal.terminal_msg(f"##############################\n")
+            self.button.config(state="disabled")
+            mainfunc(interfaces)
+            self.button.config(state="active")
+
+            if self.terminal != None:
+                self.terminal.terminal_msg(f"\n##############################")
+                self.terminal.terminal_msg(f"Script: {scriptname} finished")
+
+        except ModuleNotFoundError as e:
+            if self.terminal != None:
+                self.terminal.terminal_msg(f"No script called {scriptname} found in script folder.", True)
+            
+            PTOOLKITLOGGER.error(f"No script called {scriptname} found in script folder. " + str(e))
+        
+        except SyntaxError as e:
+            if self.terminal != None:
+                self.terminal.terminal_msg(f"Syntax error in script {scriptname}: {e}.", True)
+            PTOOLKITLOGGER.error(f"Syntax error in script {scriptname}: {e}")
+
+        except Exception as e:
+            if self.terminal != None:
+                self.terminal.terminal_msg(f"Error in script {scriptname}.", True)
+            PTOOLKITLOGGER.error(f"Error in script {scriptname}." + str(e))
+
+        self.button.config(state="active")
+
+class Button(PToolkitWidgetBase):
+    def __init__(self, root, text="", command=None):
+        PToolkitWidgetBase.__init__(self, root)
+
+        self.button = tk.Button(self.master, text=text, command=command)
+
+        self.__SETWIDGETS__(
+            [
+                [self.button]
+            ]
+        )

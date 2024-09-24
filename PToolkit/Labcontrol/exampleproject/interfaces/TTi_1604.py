@@ -26,8 +26,8 @@ class TTi_1604(Interface):
         self.dis = SevenSegmentDisplay(self, 5) #, style="rectangle"
         self.q = queue.Queue(10)
 
-        ConsumerThread("ScreenUpdate", self.dis.UpdateDisplay, self.q).Start()
-        ProducerThread("ReadData", self.Read_Data, self.q).Start()
+        ConsumerThread("ScreenUpdate", self.dis.update_display, self.q).start()
+        ProducerThread("ReadData", self.Read_Data, self.q).start()
 
 
         self.__GUI__()

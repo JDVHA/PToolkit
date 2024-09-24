@@ -12,3 +12,9 @@ build.bat
 Upload.txt
 Upload.bat
 setup.cfg
+todo.txt
+/PToolkit/Labcontrol/exampleproject
+/PToolkit/Labcontrol/exampleproject/interfaces/__pycache__
+/PToolkit/Labcontrol/__pycache__
+/PToolkit/LabControl/newproject/interfaces/__pycache__
+/PToolkit/Tools/__pycache__

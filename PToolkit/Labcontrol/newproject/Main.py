@@ -1,23 +1,21 @@
 # Configure some important things
 import sys, os, logging
 BASEDIR = os.path.dirname(os.path.abspath(__file__))
+APPNAME = "example"
 
-# Remove---------------
-sys.path.append(os.path.dirname(BASEDIR))
+from PToolkit.LabControl import MainPToolkitApp, PTOOLKITLOGGER
 
-from LabControl import MainPToolkitApp, PTOOLKITLOGGER
-
-# Configuring the logger
+# Configuring the logger 
 PTOOLKITLOGGER.setLevel(logging.INFO)
 
-# Loading the interfaces
+# Loading the interfaces folder
 sys.path.append(BASEDIR + "\\interfaces")
 
 # Your application
 # ------------------------------------------------------------------------------------------------
 from blankinterface import blankinterface
         
-root = MainPToolkitApp()
+root = MainPToolkitApp(APPNAME)
 
 blankinterface(root, "BlankInterface").pack()
 

@@ -1,80 +1,67 @@
-from LabControl import Interface
+from LabControl import *
 import tkinter as tk
 from tkinter import ttk
 import sys
 
 sys.path.append("dependencies/")
 
-from LabControl import Interface, ParameterField, SerialPortSelector, Terminal, Display, Plot, StatusLED, TkTable, VerticalAllign, KeyBoard, ArrowKeyPad
+#from PToolkit.LabControl import *
 import tkinter as tk
-import math, serial, random, queue
-from LabControl import ConsumerThread, ProducerThread
+import serial, queue
+
 
 class Arduino(Interface):
 
     def __init__(self, root, name):
         Interface.__init__(self, root, name)
-        
-        self.serial = serial.Serial()
-                
+
+        self.valign = VerticalAllign(self)
+
         self.terminal = Terminal(self)
-
-        self.vallign = VerticalAllign(self)
-
-        self.serialselector = SerialPortSelector(self.vallign, self.serial, terminal=self.terminal)
-
-        self.position = ParameterField(self.vallign, text="x", unit="m")
-
-        self.speed = ParameterField(self.vallign, text="Speed", unit="m/s")
-
-        self.actualspeed = Display(self.vallign, text="Actual speed:", unit="m/s")
-
-        self.vallign.grid(row=0, column=0, sticky="n")
-
-        self.button1 = tk.Button(self.frame, text="ABC", command=self.MyMethod)
-        self.button1.grid(row=1, column=0, sticky="n")
-
-        self.LED = StatusLED(self, text="Status:")
-        self.LED.grid(row=2, column=0, sticky="n")
-
-        self.terminal.grid(row=3, column=0, sticky="n")
-
-        self.plot = Plot(self.frame, diplayfps=True, ylim=(-5, 5))
-        self.plot.set_xlabel("Test")
-        self.plot.set_ylabel("Test")
-        self.plot.grid(row=0, column=1, rowspan=4, sticky="n")
         
-        #KeyBoard(self, 
-        #            grid=[[1, 0, 1]], textgrid=[["a", "b", "c"]]
-        #        ).pack()
-        #
-        ArrowKeyPad(self,includehome=True, design="*").grid(row=5, column=0)
-
-
-        self.terminal.Add_Command("test1", self.MyMethod)
+        self.serial = serial.Serial(baudrate=9600)
         
-        Q = queue.Queue(10)
-        C = ConsumerThread("Thread1", self.plot.Appendy, Q, terminal=self.terminal, interval=0.1)        
-        P = ProducerThread("Thread2", self.ReadArduino, Q, terminal=self.terminal, interval=0.1)
-        C.Start()
-        self.startacq = tk.Button(self.frame, text="on/off", command=P.Toggle)
-        self.startacq.grid(row=4, column=0)
+        self.portselector = SerialPortSelector(self.valign, self.serial, terminal=self.terminal)
 
-    def MyMethod(self):
-        self.actualspeed.set(random.randint(1, 10))
-        self.plot.Appendy(random.randint(1, 10))
-        self.LED.Toggle_State()
-        return math.cos(self.speed)
-    
-    def MyMethod1(self):
+        self.var = ParameterField(self.valign, "Value to send")
 
-        data = self.serial.readline()
-        self.plot.Appendy(int(data))
-        return self.speed
+        self.button = Button(self.valign, text="Send", command=self.SendVar)       
+
+        self.arduino_queue = queue.Queue(10)
+
+        self.prod = ProducerThread(
+            name="ArduinoRead",
+            generationfunction=self.ReadArduino, 
+            queue=self.arduino_queue,
+            interval=0.1,
+            terminal=self.terminal
+        ) 
+
+        self.cons = ConsumerThread(
+            name="TerminalPrinter",
+            consumerfunction=self.terminal.terminal_msg,
+            queue=self.arduino_queue,
+            interval=0.1,
+            terminal=self.terminal
+            )
+
+        self.prod.start()
+        self.cons.start()
+
+    def __GUI__(self):
+        self.valign.grid(row=0, column=0, sticky="N")
+        self.terminal.grid(row=0, column=1)
     
     def ReadArduino(self):
-        data = self.serial.readline()
-        return float(data)
+        try:
+            return self.serial.readline().decode("utf-8").rstrip()
+        except:
+            pass
+    
+    def SendVar(self):
+        msg = (str(self.var) + "\n").encode("utf-8")
+        self.serial.write(msg)
+    
 
 
 
