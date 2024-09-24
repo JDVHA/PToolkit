@@ -5,6 +5,7 @@ setup(
     name="PToolkit",
     version=version,
     description="A set of tools to make working in a lab easier.",
+    long_description="A set of tools to make working in a lab easier.",
     url="https://github.com/JDVHA/PToolkit",
     author="H.A.J de Vries",
     author_email="",

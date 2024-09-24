@@ -18,3 +18,4 @@ todo.txt
 /PToolkit/Labcontrol/__pycache__
 /PToolkit/LabControl/newproject/interfaces/__pycache__
 /PToolkit/Tools/__pycache__
+.pypirc
