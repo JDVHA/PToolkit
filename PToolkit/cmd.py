@@ -49,7 +49,25 @@ def Help_PToolkit(terminalpath, arguments):
 def Create_new_project(terminalpath, arguments):
     """Create a new project. Arguments: <projectname>"""
     try:
-        shutil.copytree(PTOOLKIT_PATH+"\\Labcontrol\\newproject", terminalpath+f"\\{arguments[0]}")
+        new_loc = terminalpath+f"\\{arguments[0]}"
+        shutil.copytree(PTOOLKIT_PATH+"\\Labcontrol\\newproject", new_loc)
+
+        if not os.path.isfile(new_loc+"\\.state"):
+            open(new_loc+"\\.state")
+
+        if not os.path.isdir(new_loc+"\\scripts"):
+            os.mkdir(new_loc+"\\scripts")
+
+        if not os.path.isdir(new_loc+"\\profiles"):
+            os.mkdir(new_loc+"\\profiles")
+        
+        if not os.path.isdir(new_loc+"\\log"):
+            os.mkdir(new_loc+"\\log")
+
+        for root, dirs, files in os.walk(new_loc):
+            if dirs == "__pycache__":
+                os.remove(dirs)
+
         print(f"SUCCES: Created project {arguments[0]}")
 
     except IndexError as e:
