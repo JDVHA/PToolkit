@@ -5,7 +5,7 @@ Getting started
 ***************
 
 PToolkit LabControl provides an environment for creating gui applications for lab setups. 
-It does this by introducing a standard framework and a set of widgets. To get stared create a project using the follow command where <projectname> is the name of your application
+It does this by introducing a standard framework and a set of widgets. To get started create a project using the follow command where <projectname> is the name of your application
 
 ::
     
