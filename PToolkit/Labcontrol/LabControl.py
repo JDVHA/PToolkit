@@ -32,7 +32,7 @@ class MainPToolkitApp(tk.Tk):
         self.interfaces = {}
 
         self.exitfunc = lambda: print("")
-        self.protocol("WM_DELETE_WINDOW", self.StopApp)
+        self.protocol("WM_DELETE_WINDOW", self.stop_app)
         self.title(self.name)
 
         scriptpath = sys.path[0] + "\\scripts" + "\\"
@@ -40,10 +40,10 @@ class MainPToolkitApp(tk.Tk):
         sys.path.append(scriptpath)
 
     def mainloop(self):
-        self.startApp()
+        self.start_app()
         self.tk.mainloop()
     
-    def startApp(self):
+    def start_app(self):
         global INIT_FASE
         if not INIT_FASE:
             raise SystemError("""INIT_FASE was false. Possible causes: INIT_FASE was changed in the program by the user. Or a second App was created, a maximum of 1 App may exist per program.""")
@@ -58,7 +58,7 @@ class MainPToolkitApp(tk.Tk):
     def set_exit_func(self, func):
         self.exitfunc = func
 
-    def StopApp(self):
+    def stop_app(self):
         if tk.messagebox.askokcancel("Quit", f"Do you want to quit {self.name}?"):
             self.exitfunc()
             for interface in list(self.interfaces.values()):
@@ -69,12 +69,30 @@ class MainPToolkitApp(tk.Tk):
             sys.exit()
 
 
-    def AppendInterface(self, interface):
+    def append_interface(self, interface):
         if interface.name in list(self.interfaces.keys()):
             raise NameError(f"Interface with name: {interface.name} already exists.")
         else:
 
             self.interfaces[interface.name] = interface
+
+    def validate_project(self):
+        project_path = ""
+
+        if not os.path.isfile(project_path+"\\.state"):
+            open(project_path+"\\.state")
+
+        if not os.path.isdir(project_path+"\\scripts"):
+            os.mkdir(project_path+"\\scripts")
+
+        if not os.path.isdir(project_path+"\\profiles"):
+            os.mkdir(project_path+"\\profiles")
+        
+        if not os.path.isdir(project_path+"\\log"):
+            os.mkdir(project_path+"\\log")
+
+        
+
        
 class Interface:
     def __init__(self, master, name):
@@ -88,13 +106,7 @@ class Interface:
         PTOOLKITLOGGER.debug(f"Just created an instance of {self.classname}.")
         PTOOLKITLOGGER.debug(f"Starting post init of an {self.classname} instance.")
 
-        self.master.AppendInterface(self)
-
-        #for i in dir(self):
-        #    if not (i.startswith("_") or i.endswith("_") or i in self.utilfuncs):
-        #        if callable(getattr(self, i)):
-        #            name = getattr(self, i)()
-        #            self.commands[name] = getattr(self, i)
+        self.master.append_interface(self)
 
         PTOOLKITLOGGER.debug(f"Finished post init of an {self.classname} instance.")        
     

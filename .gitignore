@@ -19,3 +19,6 @@ todo.txt
 /PToolkit/LabControl/newproject/interfaces/__pycache__
 /PToolkit/Tools/__pycache__
 .pypirc
+Local install.bat
+MANIFEST.in
+*.pyc

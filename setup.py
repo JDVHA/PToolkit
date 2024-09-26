@@ -1,5 +1,5 @@
 from setuptools import setup
-version = "2.0.0"
+version = "2.0.5"
 import pathlib
 HERE = pathlib.Path(__file__).parent
 README = (HERE / "README.md").read_text()
@@ -14,7 +14,8 @@ setup(
     author="H.A.J de Vries",
     author_email="",
     license="MIT",
-    download_url="https://github.com/JDVHA/PToolkit/archive/refs/tags/1.0.tar.gz",
+    include_package_data = True,
+    download_url="https://github.com/JDVHA/PToolkit/archive/refs/tags/2.0.tar.gz",
     install_requires=[
           'numpy',
           "matplotlib",
